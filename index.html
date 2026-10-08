@@ -100,7 +100,8 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .lrow:hover,.lrow:focus-visible{transform:translateX(4px);box-shadow:inset 0 0 0 3px rgba(10,13,23,.5),inset 0 0 0 4px rgba(216,178,106,.6),0 16px 34px rgba(0,0,0,.55),0 0 26px rgba(216,178,106,.2);outline:none}
 .lrow .pic{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(243,220,162,.25),transparent 65%)}
 .lrow .pic img{position:absolute;left:50%;top:10px;height:175%;max-width:none;transform:translateX(-50%);filter:drop-shadow(0 8px 14px rgba(0,0,0,.6));transition:transform .3s ease}
-.lrow:hover .pic img{transform:translateX(-50%) scale(1.04)}
+.lrow .pic img{transform-origin:50% 0}
+.lrow:hover .pic img{filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) brightness(1.08)}
 .lrow .txt{align-self:center;padding:20px 0}
 .lrow h4{margin:0;font:800 clamp(21px,2.3vw,28px)/1.3 var(--mincho);letter-spacing:.04em;color:var(--parch)}
 .lrow .detail{margin:8px 0 0;font:500 clamp(14px,1.45vw,16px)/1.65 var(--mincho);color:var(--muted)}
@@ -116,7 +117,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
   .lrow .meta{grid-column:2;grid-row:1;align-self:end;text-align:left;padding-top:14px;line-height:1.4;font-size:13px}
   .lrow .meta .pub{font-size:13px}
   .lrow .meta br{display:none}
-  .lrow .meta .les:before{content:"・"}
+  .lrow .meta .pub ~ .les:before{content:"・"}
   .lrow .pic{grid-row:1 / span 2}
   .lrow .txt{grid-column:2;padding:4px 0 14px}
   .lrow h4{font-size:19px}
@@ -299,12 +300,40 @@ function renderHall(c) {
     const pub = g.pub ? `<span class="pub">${esc(g.pub.replace(/-/g, "/"))} 公開</span><br>` : "";
     const les = g.lessons ? `<span class="les">${g.lessons}コマ</span>` : "";
     return `<button class="lrow" data-go="#/play/${esc(g.id)}">
-      <div class="pic"><img src="${g.card}" alt="" loading="lazy"></div>
+      <div class="pic"><img src="${g.card}" alt=""></div>
       <div class="txt"><h4>${esc(g.title || g.ja)}</h4><p class="detail">${esc(g.detail || g.sub_ja)}</p></div>
       <div class="meta">${pub}${les}</div></button>`;
   }).join("");
   $("#hall .scroll").scrollTop = 0;
+  document.querySelectorAll("#cards .pic img").forEach(img => img.complete ? fitPic(img) : img.addEventListener("load", () => fitPic(img), {once: true}));
 }
+
+/* 絵の中で人物が占める範囲（透明でないところ）を読み取り、頭から上半身が枠に入るように置く。
+   絵ごとに人物の大きさ・位置が違う（座った姿・杖を掲げた姿など）ため、決め打ちの切り取りでは合わない */
+const figureBox = new Map();
+function measureFigure(img) {
+  if (figureBox.has(img.src)) return figureBox.get(img.src);
+  const w = 120, h = Math.round(120 * img.naturalHeight / img.naturalWidth);
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  const cx = cv.getContext("2d"); cx.drawImage(img, 0, 0, w, h);
+  const a = cx.getImageData(0, 0, w, h).data;
+  let top = h, bottom = 0, left = w, right = 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (a[(y * w + x) * 4 + 3] > 40) {
+    if (y < top) top = y; if (y > bottom) bottom = y; if (x < left) left = x; if (x > right) right = x;
+  }
+  const box = top > bottom ? {top: 0, bottom: 1, cx: .5} : {top: top / h, bottom: (bottom + 1) / h, cx: (left + right + 1) / 2 / w};
+  figureBox.set(img.src, box);
+  return box;
+}
+function fitPic(img) {
+  const pic = img.parentElement, pw = pic.clientWidth, ph = pic.clientHeight;
+  if (!pw || !ph || !img.naturalWidth) return;
+  const b = measureFigure(img);
+  const imgH = ph * 1.7 / (b.bottom - b.top);          // 人物の背丈を枠の1.7倍に（上の6割ほどが見える）
+  const imgW = imgH * img.naturalWidth / img.naturalHeight;
+  Object.assign(img.style, {height: imgH + "px", top: (8 - b.top * imgH) + "px", left: (pw / 2 - b.cx * imgW) + "px", transform: "none", bottom: "auto"});
+}
+addEventListener("resize", () => document.querySelectorAll("#cards .pic img").forEach(fitPic));
 
 /* ---------- Reading room ---------- */
 function closeGame() {

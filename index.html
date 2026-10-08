@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Theorem Learning Field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Shippori+Mincho+B1:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0d17; --navy:#121a33; --navy2:#1b2648;
+  --gold:#d8b26a; --gold-hi:#f3dca2; --gold-lo:#8a6a32;
+  --parch:#efe4c8; --text:#f1e9d6; --muted:#c3b48f;
+  --serif-h:"Cinzel","Trajan Pro",Georgia,serif;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --mincho:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--text);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+.screen{position:fixed;inset:0;display:none;overflow:hidden}
+.screen.on{display:block}
+
+/* ---------- Gate ---------- */
+#gate{background:var(--ink)}
+#gate .gbg{position:absolute;inset:0;background:url(gate.jpg) center/cover}
+#gate .gveil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,rgba(10,13,23,.25),rgba(10,13,23,.7) 85%)}
+#gate .stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+#gate .gtitle{margin:0 0 26px;text-align:center;font:700 clamp(30px,5.6vw,64px)/1.08 var(--serif-h);letter-spacing:.06em;color:var(--parch);text-shadow:0 4px 28px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.6)}
+#gate .gtitle small{display:block;margin-top:12px;font-size:.22em;letter-spacing:.5em;color:var(--gold-hi)}
+.seal{position:relative;width:min(420px,calc(100% - 32px));margin:14px auto calc(18px + env(safe-area-inset-bottom));
+  padding:18px 20px 16px;border:1px solid var(--gold-lo);border-radius:6px;
+  background:linear-gradient(180deg,rgba(18,26,51,.92),rgba(10,13,23,.94));
+  box-shadow:0 0 0 4px rgba(10,13,23,.6),0 0 0 5px rgba(216,178,106,.35),0 18px 50px rgba(0,0,0,.6)}
+.seal:before,.seal:after{content:"";position:absolute;left:50%;width:9px;height:9px;background:var(--gold);transform:translateX(-50%) rotate(45deg)}
+.seal:before{top:-5px}.seal:after{bottom:-5px}
+.seal h2{margin:0 0 12px;text-align:center;font:600 13px/1 var(--serif-h);letter-spacing:.32em;color:var(--gold-hi);text-transform:uppercase}
+.seal form{display:flex;gap:8px}
+.seal input[type=password]{flex:1;min-width:0;padding:10px 12px;border-radius:4px;border:1px solid var(--gold-lo);
+  background:rgba(239,228,200,.06);color:var(--parch);font-size:18px;letter-spacing:.08em;outline:none}
+.seal input[type=password]:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(216,178,106,.25)}
+.btn{cursor:pointer;padding:10px 18px;border-radius:4px;border:1px solid var(--gold);
+  background:linear-gradient(180deg,#e6c47c,#a67d3c);color:#1a1206;font:700 13px/1 var(--serif-h);letter-spacing:.16em;text-transform:uppercase}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.6;cursor:wait}
+.seal .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:15px;color:var(--muted)}
+.seal label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.seal input[type=checkbox]{accent-color:var(--gold)}
+.seal .err{min-height:1.2em;color:#f0a58a;font-style:italic}
+
+
+/* ---------- Field & Hall ---------- */
+.bg{position:absolute;inset:0;background-position:center;background-size:cover;transform:scale(1.02)}
+.veil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(10,13,23,0),rgba(10,13,23,.55) 80%),linear-gradient(180deg,rgba(10,13,23,.5),rgba(10,13,23,.05) 32%,rgba(10,13,23,.7))}
+.scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wrap{max-width:1180px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.brand{font:700 clamp(15px,2.2vw,19px)/1 var(--serif-h);letter-spacing:.22em;color:var(--gold-hi);text-transform:uppercase;text-shadow:0 2px 12px rgba(0,0,0,.8);cursor:pointer;background:none;border:0;padding:0}
+.link{background:none;border:0;cursor:pointer;color:var(--muted);font:500 14px/1 var(--serif-h);letter-spacing:.14em;text-transform:uppercase;padding:6px 0}
+.link:hover{color:var(--gold-hi)}
+.back{cursor:pointer;padding:10px 18px;border-radius:24px;border:1px solid var(--gold);background:rgba(10,13,23,.72);color:var(--gold-hi);font:700 16px/1 var(--mincho);letter-spacing:.06em;white-space:nowrap;flex:none;box-shadow:0 4px 16px rgba(0,0,0,.45)}
+.back:hover,.back:focus-visible{background:rgba(216,178,106,.2);outline:none}
+.ornament{display:flex;align-items:center;gap:14px;justify-content:center;color:var(--gold);margin:6px 0 4px}
+.ornament:before,.ornament:after{content:"";height:1px;width:min(160px,22vw);background:linear-gradient(90deg,transparent,var(--gold))}
+.ornament:after{transform:scaleX(-1)}
+#bg-title-blur{filter:blur(26px) brightness(.4);transform:scale(1.1)}
+#seal-btn{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));right:18px;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+.hero{position:relative;max-width:1671px;margin:0 auto}
+.hero img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
+.field-wrap{position:relative;padding-top:0}
+@media (min-width:761px){ .field-wrap{margin-top:max(-20vw,-330px)} .doors{margin-top:0} }
+.headline{text-align:center;margin:clamp(24px,7vh,70px) 0 10px}
+.headline h1{margin:0;font:700 clamp(28px,5.4vw,58px)/1.08 var(--serif-h);letter-spacing:.06em;color:var(--parch);text-shadow:0 4px 24px rgba(0,0,0,.85)}
+.headline p{margin:12px auto 0;display:inline-block;padding:2px 14px;background:rgba(10,13,23,.38);border-radius:20px;max-width:620px;font-size:clamp(17px,2vw,21px);font-style:italic;color:var(--muted);text-shadow:0 2px 10px rgba(0,0,0,.9)}
+
+.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,26px);margin-top:clamp(26px,6vh,56px)}
+.door{position:relative;cursor:pointer;text-align:center;padding:34px 22px 26px;border:1px solid rgba(216,178,106,.55);border-radius:140px 140px 6px 6px;
+  background:linear-gradient(180deg,rgba(27,38,72,.78),rgba(10,13,23,.9));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  box-shadow:inset 0 0 0 5px rgba(10,13,23,.55),inset 0 0 0 6px rgba(216,178,106,.25),0 20px 40px rgba(0,0,0,.45);
+  transition:transform .25s ease,box-shadow .25s ease;color:var(--text)}
+.door:hover,.door:focus-visible{transform:translateY(-4px);box-shadow:inset 0 0 0 5px rgba(10,13,23,.55),inset 0 0 0 6px rgba(216,178,106,.55),0 26px 50px rgba(0,0,0,.55),0 0 34px rgba(216,178,106,.22);outline:none}
+.door .num{font:700 15px/1 var(--serif-h);color:var(--gold);letter-spacing:.3em;margin-top:14px}
+.door h3{margin:14px 0 10px;font:700 clamp(19px,2vw,24px)/1.2 var(--serif-h);letter-spacing:.08em;color:var(--gold-hi)}
+.door p.jname{margin:0 auto;font:800 clamp(20px,2.1vw,26px)/1.3 var(--mincho);letter-spacing:.18em;color:var(--parch)}
+.door .count{display:inline-block;margin-top:16px;font:500 12px/1 var(--serif-h);letter-spacing:.24em;text-transform:uppercase;color:var(--muted);border-top:1px solid rgba(216,178,106,.35);padding-top:12px}
+
+.hall-head{text-align:center;margin:clamp(18px,5vh,44px) 0 clamp(20px,4vh,36px)}
+.hall-head .num{font:700 14px/1 var(--serif-h);color:var(--gold);letter-spacing:.34em}
+.hall-head .en{margin-top:10px;font:600 clamp(12px,1.3vw,14px)/1 var(--serif-h);letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.hall-head h1{margin:10px 0 10px;font:800 clamp(28px,4.4vw,46px)/1.2 var(--mincho);letter-spacing:.12em;color:var(--parch);text-shadow:0 4px 24px rgba(0,0,0,.85)}
+.hall-head p{margin:0 auto;display:inline-block;padding:4px 16px;background:rgba(10,13,23,.45);border-radius:20px;max-width:640px;font:500 clamp(14px,1.7vw,17px)/1.6 var(--mincho);color:var(--muted);text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.cards{display:flex;flex-direction:column;gap:14px;max-width:1040px;margin:0 auto}
+.lrow{position:relative;display:grid;grid-template-columns:150px minmax(0,1fr) auto;align-items:stretch;gap:0 22px;width:100%;min-height:150px;
+  cursor:pointer;text-align:left;color:var(--text);padding:0 26px 0 0;border:1px solid var(--gold-lo);border-radius:8px;overflow:hidden;
+  background:linear-gradient(90deg,rgba(31,43,82,.92),rgba(14,19,38,.94) 40%,rgba(10,13,23,.94));
+  box-shadow:inset 0 0 0 3px rgba(10,13,23,.5),inset 0 0 0 4px rgba(216,178,106,.22),0 12px 28px rgba(0,0,0,.45);transition:transform .2s ease,box-shadow .2s ease}
+.lrow:hover,.lrow:focus-visible{transform:translateX(4px);box-shadow:inset 0 0 0 3px rgba(10,13,23,.5),inset 0 0 0 4px rgba(216,178,106,.6),0 16px 34px rgba(0,0,0,.55),0 0 26px rgba(216,178,106,.2);outline:none}
+.lrow .pic{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(243,220,162,.25),transparent 65%)}
+.lrow .pic img{position:absolute;left:50%;top:10px;height:175%;max-width:none;transform:translateX(-50%);filter:drop-shadow(0 8px 14px rgba(0,0,0,.6));transition:transform .3s ease}
+.lrow:hover .pic img{transform:translateX(-50%) scale(1.04)}
+.lrow .txt{align-self:center;padding:20px 0}
+.lrow h4{margin:0;font:800 clamp(21px,2.3vw,28px)/1.3 var(--mincho);letter-spacing:.04em;color:var(--parch)}
+.lrow .detail{margin:8px 0 0;font:500 clamp(14px,1.45vw,16px)/1.65 var(--mincho);color:var(--muted)}
+.lrow .meta{align-self:center;text-align:right;white-space:nowrap;font:600 15px/1.9 var(--mincho);color:var(--muted)}
+.lrow .meta .pub{font-size:16px;color:var(--gold-hi)}
+
+footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;font-style:italic;color:rgba(195,180,143,.8)}
+
+@media (max-width:760px){
+  .doors{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}
+  .door{border-radius:110px 110px 6px 6px;padding:26px 18px 20px}
+  .lrow{grid-template-columns:92px minmax(0,1fr);gap:0 12px;padding:0 12px 0 0;min-height:128px}
+  .lrow .meta{grid-column:2;grid-row:1;align-self:end;text-align:left;padding-top:14px;line-height:1.4;font-size:13px}
+  .lrow .meta .pub{font-size:13px}
+  .lrow .meta br{display:none}
+  .lrow .meta .les:before{content:"・"}
+  .lrow .pic{grid-row:1 / span 2}
+  .lrow .txt{grid-column:2;padding:4px 0 14px}
+  .lrow h4{font-size:19px}
+  .lrow .detail{font-size:12.5px;line-height:1.55}
+  .brand{font-size:12px;letter-spacing:.14em;white-space:nowrap}
+  .link{font-size:11px;white-space:nowrap}
+}
+
+/* ---------- Reading room (game) ---------- */
+#play{background:#000}
+#playbar{position:absolute;z-index:5;left:0;right:0;top:0;height:calc(52px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 10px 0;
+  display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#151d38,#0b0f1c);border-bottom:1px solid var(--gold-lo);box-shadow:0 2px 12px rgba(0,0,0,.5)}
+#playbar .back{padding:9px 16px;font-size:15px;flex:none}
+#playbar .back.sub{border-color:var(--gold-lo);color:var(--muted)}
+#play-title{flex:1;min-width:0;text-align:right;font:700 15px/1.2 var(--mincho);color:var(--gold-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px}
+#play iframe{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));width:100%;height:calc(100% - 52px - env(safe-area-inset-top));border:0;background:#000}
+@media (max-width:520px){#playbar .back{padding:8px 12px;font-size:14px}#playbar .back.sub{display:none}#play-title{font-size:13px}}
+#loading{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse,#1b2648,#0a0d17 70%)}
+#loading.on{display:flex}
+#loading .t{font:600 14px/1 var(--serif-h);letter-spacing:.3em;text-transform:uppercase;color:var(--gold-hi)}
+#loading .bar{width:min(320px,70vw);height:3px;background:rgba(216,178,106,.2);border-radius:2px;overflow:hidden}
+#loading .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi));transition:width .15s}
+#loading .s{font-style:italic;color:var(--muted)}
+
+</style>
+</head>
+<body>
+
+<section id="gate" class="screen on" aria-label="Gate">
+  <div class="gbg"></div><div class="gveil"></div>
+  <div class="stage">
+    <h1 class="gtitle">Theorem<br>Learning Field<small>✦</small></h1>
+    <div class="seal">
+      <h2>Speak the Word</h2>
+      <form id="gate-form" autocomplete="off">
+        <input id="pw" type="password" autocomplete="current-password" aria-label="Password" placeholder="Password">
+        <button class="btn" id="enter" type="submit">Enter</button>
+      </form>
+      <div class="row">
+        <label id="remember-label"><input type="checkbox" id="remember" checked> Remember this device</label>
+        <span class="err" id="err"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="field" class="screen" aria-label="The Field">
+  <div class="bg" id="bg-title-blur"></div><div class="veil"></div>
+  <div class="scroll">
+    <button class="link" id="seal-btn">Seal the Field</button>
+    <div class="hero"><img id="hero-img" alt="Theorem Learning Field"></div>
+    <div class="wrap field-wrap">
+    <div class="doors" id="doors"></div>
+    <footer class="note" id="footer-note"></footer>
+  </div></div>
+</section>
+
+<section id="hall" class="screen" aria-label="Hall">
+  <div class="bg" id="bg-library"></div><div class="veil"></div>
+  <div class="scroll"><div class="wrap">
+    <header class="top">
+      <button class="back" data-go="#/">← トップに戻る</button>
+      <button class="brand" data-go="#/">Theorem Learning Field</button>
+    </header>
+    <div class="hall-head">
+      <div class="num" id="hall-num"></div>
+      <div class="en" id="hall-en"></div>
+      <h1 id="hall-title"></h1>
+      <p id="hall-desc"></p>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div></div>
+</section>
+
+<section id="play" class="screen" aria-label="Reading room">
+  <div id="playbar"><button class="back" data-go="back">← 一覧に戻る</button><button class="back sub" data-go="#/">トップに戻る</button><div id="play-title"></div></div>
+  <div id="loading"><div class="t">Unsealing</div><div class="bar"><i id="bar"></i></div><div class="s" id="loading-name"></div></div>
+</section>
+
+
+<script>
+"use strict";
+// 他のサイトの枠の中では開かない
+if (window.top !== window.self) { document.documentElement.innerHTML = ""; throw new Error("framed"); }
+const SALT = "92f3313c63876f2475c283d7817d983b", ITER = 600000, VERIFY = "b9a2cf3b1bf5dd6669e719f478a4e38bca36a4beca6a09908ba7b204a3a90461";
+const KEY_STORE = "tlf_key";
+// github.io のプロジェクトページ（/リポジトリ名/ の下）は、同じアカウントの他のページと保存領域を共有する。
+// その場合は鍵をこの端末に覚えない（他のページのプログラムから鍵が読めてしまうため）。
+const SHARED_ORIGIN = /\.github\.io$/.test(location.hostname) && location.pathname.split("/")[1] !== "";
+if (SHARED_ORIGIN) { try { localStorage.removeItem(KEY_STORE); } catch (_) {} }
+const $ = s => document.querySelector(s);
+const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+const unhex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)));
+let aesKey = null, catalog = null, blobUrl = null;
+
+async function derive(pw) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: unhex(SALT), iterations: ITER, hash: "SHA-256"}, base, 512);
+  const enc = bits.slice(0, 32), mac = bits.slice(32);
+  const macKey = await crypto.subtle.importKey("raw", mac, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", macKey, new TextEncoder().encode("theorem-learning-field"));
+  return hex(sig) === VERIFY ? enc : null;
+}
+const importAes = raw => crypto.subtle.importKey("raw", raw, "AES-CBC", false, ["decrypt"]);
+async function decrypt(buf) {
+  return crypto.subtle.decrypt({name: "AES-CBC", iv: buf.slice(0, 16)}, aesKey, buf.slice(16));
+}
+async function fetchBin(url, onProgress) {
+  const res = await fetch(url, {cache: "no-cache"});
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const total = +res.headers.get("content-length") || 0;
+  if (!res.body || !total || !onProgress) return res.arrayBuffer();
+  const reader = res.body.getReader(), parts = []; let got = 0;
+  for (;;) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    parts.push(value); got += value.length; onProgress(got / total);
+  }
+  const out = new Uint8Array(got); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out.buffer;
+}
+async function openCatalog() {
+  const buf = await fetchBin("data/catalog.bin");
+  catalog = JSON.parse(new TextDecoder().decode(await decrypt(buf)));
+  $("#bg-title-blur").style.backgroundImage = `url(${catalog.title_art})`;
+  $("#hero-img").src = catalog.title_art;
+  $("#bg-library").style.backgroundImage = `url(${catalog.bg_library})`;
+  $("#footer-note").textContent = catalog.footer_en || "";
+    renderDoors();
+}
+
+/* ---------- Gate ---------- */
+$("#gate-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const pw = $("#pw").value; if (!pw) return;
+  $("#enter").disabled = true; $("#err").textContent = "";
+  try {
+    const raw = await derive(pw);
+    if (!raw) { $("#err").textContent = "The seal does not yield."; return; }
+    aesKey = await importAes(raw);
+    await openCatalog();
+    try { $("#remember").checked && !SHARED_ORIGIN ? localStorage.setItem(KEY_STORE, hex(raw)) : localStorage.removeItem(KEY_STORE); } catch (_) {}
+    $("#pw").value = "";
+    route();
+  } catch (err) {
+    $("#err").textContent = "The archive could not be opened.";
+    console.error(err);
+  } finally { $("#enter").disabled = false; }
+});
+$("#seal-btn").addEventListener("click", () => {
+  try { localStorage.removeItem(KEY_STORE); } catch (_) {}
+  aesKey = null; catalog = null; location.hash = "#/"; show("gate");
+});
+
+/* ---------- Rendering ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const word = n => ["Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve"][n] || n;
+function renderDoors() {
+  $("#doors").innerHTML = catalog.categories.map(c => {
+    const n = catalog.games.filter(g => g.category === c.id).length;
+    const unit = c.id === "quests" ? (n === 1 ? "Quest" : "Quests") : (n === 1 ? "Lecture" : "Lectures");
+    return `<button class="door" data-go="#/${esc(c.id)}">
+      <div class="ornament">✦</div><div class="num">${esc(c.numeral)}</div>
+      <h3>${esc(c.en)}</h3>
+      <p class="jname">${esc(c.ja)}</p>
+      <span class="count">${word(n)} ${unit}</span></button>`;
+  }).join("");
+}
+const isPhone = () => matchMedia("(max-width: 760px) and (pointer: coarse)").matches;
+function renderHall(c) {
+  $("#hall-num").textContent = c.numeral;
+  $("#hall-en").textContent = c.en;
+  $("#hall-title").textContent = c.ja;
+  $("#hall-desc").textContent = c.desc_ja;
+  const list = catalog.games.filter(g => g.category === c.id)
+    .map((g, i) => [g, i]).sort((a, b) => (a[0].pub || "9") < (b[0].pub || "9") ? -1 : (a[0].pub || "9") > (b[0].pub || "9") ? 1 : a[1] - b[1])
+    .map(x => x[0]);
+  $("#cards").innerHTML = list.map(g => {
+    const pub = g.pub ? `<span class="pub">${esc(g.pub.replace(/-/g, "/"))} 公開</span><br>` : "";
+    const les = g.lessons ? `<span class="les">${g.lessons}コマ</span>` : "";
+    return `<button class="lrow" data-go="#/play/${esc(g.id)}">
+      <div class="pic"><img src="${g.card}" alt="" loading="lazy"></div>
+      <div class="txt"><h4>${esc(g.title || g.ja)}</h4><p class="detail">${esc(g.detail || g.sub_ja)}</p></div>
+      <div class="meta">${pub}${les}</div></button>`;
+  }).join("");
+  $("#hall .scroll").scrollTop = 0;
+}
+
+/* ---------- Reading room ---------- */
+function closeGame() {
+  const f = $("#play iframe"); if (f) f.remove();
+  if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+}
+async function openGame(g) {
+  closeGame();
+  show("play");
+  $("#loading").classList.add("on"); $("#bar").style.width = "0";
+  $("#loading-name").textContent = g.ja;
+  $("#play-title").textContent = g.ja + (g.sub_ja ? "　" + g.sub_ja : "");
+  try {
+    const file = (isPhone() && g.file_mobile) || g.file;
+    const buf = await fetchBin(file, r => $("#bar").style.width = (r * 92).toFixed(1) + "%");
+    const html = await decrypt(buf);
+    $("#bar").style.width = "100%";
+    if (location.hash !== "#/play/" + g.id) return;   // left while loading
+    blobUrl = URL.createObjectURL(new Blob([html], {type: "text/html;charset=utf-8"}));
+    const f = document.createElement("iframe");
+    f.src = blobUrl; f.title = g.ja; f.allow = "fullscreen; autoplay"; f.allowFullscreen = true;
+    $("#play").appendChild(f);
+    f.addEventListener("load", () => $("#loading").classList.remove("on"), {once: true});
+  } catch (err) {
+    console.error(err);
+    $("#loading-name").textContent = "開けませんでした。通信を確かめて、もう一度お試しください。";
+  }
+}
+
+/* ---------- Routing ---------- */
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+}
+function route() {
+  if (!catalog) { show("gate"); return; }
+  const h = location.hash.replace(/^#\/?/, "");
+  if (h.startsWith("play/")) {
+    const g = catalog.games.find(x => x.id === h.slice(5));
+    if (g) { openGame(g); return; }
+  }
+  closeGame();
+  const c = catalog.categories.find(x => x.id === h);
+  if (c) { renderHall(c); show("hall"); } else show("field");
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-go]"); if (!t) return;
+  const go = t.dataset.go;
+  if (go === "back") {
+    const g = catalog && catalog.games.find(x => "#/play/" + x.id === location.hash);
+    location.hash = g ? "#/" + g.category : "#/";
+  } else location.hash = go;
+});
+addEventListener("hashchange", route);
+
+/* ---------- Start ---------- */
+(async () => {
+  if (SHARED_ORIGIN) $("#remember-label").style.display = "none";
+  let saved = null;
+  try { saved = SHARED_ORIGIN ? null : localStorage.getItem(KEY_STORE); } catch (_) {}
+  if (saved) {
+    try { aesKey = await importAes(unhex(saved)); await openCatalog(); }
+    catch (err) {
+      aesKey = null; catalog = null;
+      // 鍵が合わない（パスワードが変わった）ときだけ忘れる。通信の失敗では忘れない
+      if (!(err instanceof TypeError) && !/^HTTP /.test(err.message)) { try { localStorage.removeItem(KEY_STORE); } catch (__) {} }
+      else { $("#err").textContent = "The archive could not be reached."; }
+    }
+  }
+  route();
+  if (!catalog) $("#pw").focus();
+})();
+</script>
+</body>
+</html>

@@ -364,7 +364,7 @@ async function openGame(g) {
     if (location.hash !== "#/play/" + g.id) return;   // left while loading
     blobUrl = URL.createObjectURL(new Blob([html], {type: "text/html;charset=utf-8"}));
     const f = document.createElement("iframe");
-    f.src = blobUrl + (g.open_hash ? "#" + g.open_hash : ""); f.title = g.ja; f.allow = "fullscreen; autoplay"; f.allowFullscreen = true;
+    f.src = blobUrl + (g.open_hash ? "#" + g.open_hash : ""); f.setAttribute("aria-label", g.ja); f.allow = "fullscreen; autoplay"; f.allowFullscreen = true;
     $("#play").appendChild(f);
     f.addEventListener("load", () => $("#loading").classList.remove("on"), {once: true});
   } catch (err) {

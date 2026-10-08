@@ -67,7 +67,13 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .ornament:before,.ornament:after{content:"";height:1px;width:min(160px,22vw);background:linear-gradient(90deg,transparent,var(--gold))}
 .ornament:after{transform:scaleX(-1)}
 #bg-title-blur{filter:blur(26px) brightness(.4);transform:scale(1.1)}
-#seal-btn{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));right:18px;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+.seal-row{text-align:center;margin-top:14px}
+#seal-btn{position:relative;font-size:10.5px;letter-spacing:.16em;color:rgba(195,180,143,.5);text-shadow:none;padding:4px 2px}
+#seal-btn:hover{color:var(--muted)}
+#seal-btn:after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;
+  padding:6px 10px;border-radius:4px;border:1px solid var(--gold-lo);background:rgba(10,13,23,.95);color:var(--parch);
+  font:500 13px/1.4 var(--mincho);letter-spacing:.02em;text-transform:none;opacity:0;pointer-events:none;transition:opacity .15s}
+#seal-btn:hover:after,#seal-btn:focus-visible:after{opacity:1}
 .hero{position:relative;max-width:1671px;margin:0 auto}
 .hero img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
 .field-wrap{position:relative;padding-top:0}
@@ -179,11 +185,11 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
 <section id="field" class="screen" aria-label="The Field">
   <div class="bg" id="bg-title-blur"></div><div class="veil"></div>
   <div class="scroll">
-    <button class="link" id="seal-btn">Seal the Field</button>
     <div class="hero"><img id="hero-img" alt="Theorem Learning Field"></div>
     <div class="wrap field-wrap">
     <div class="doors" id="doors"></div>
     <footer class="note" id="footer-note"></footer>
+    <div class="seal-row"><button class="link" id="seal-btn" data-tip="保存したパスワードをクリアします">Seal the Field</button></div>
   </div></div>
 </section>
 
@@ -281,6 +287,7 @@ $("#gate-form").addEventListener("submit", async e => {
   } finally { $("#enter").disabled = false; }
 });
 $("#seal-btn").addEventListener("click", () => {
+  if (!confirm("この端末に保存したパスワードを消します。次に開くときは、もう一度パスワードを入れます。\n（学習の記録は消えません）")) return;
   try { localStorage.removeItem(KEY_STORE); } catch (_) {}
   aesKey = null; catalog = null; location.hash = "#/"; show("gate");
 });

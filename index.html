@@ -137,7 +137,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
 #playbar .back.sub{border-color:var(--gold-lo);color:var(--muted)}
 #play-title{flex:1;min-width:0;text-align:right;font:700 15px/1.2 var(--mincho);color:var(--gold-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px}
 #play iframe{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));width:100%;height:calc(100% - 52px - env(safe-area-inset-top));border:0;background:#000}
-@media (max-width:520px){#playbar .back{padding:8px 12px;font-size:14px}#playbar .back.sub{display:none}#play-title{font-size:13px}}
+@media (max-width:520px){#playbar{gap:6px}#playbar .back{padding:8px 10px;font-size:13px;letter-spacing:.02em}#play-title{display:none}}
 #loading{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse,#1b2648,#0a0d17 70%)}
 #loading.on{display:flex}
 #loading .t{font:600 14px/1 var(--serif-h);letter-spacing:.3em;text-transform:uppercase;color:var(--gold-hi)}
@@ -182,7 +182,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
   <div class="bg" id="bg-library"></div><div class="veil"></div>
   <div class="scroll"><div class="wrap">
     <header class="top">
-      <button class="back" data-go="#/">← トップに戻る</button>
+      <button class="back" data-go="#/">← トップページに戻る</button>
       <button class="brand" data-go="#/">Theorem Learning Field</button>
     </header>
     <div class="hall-head">
@@ -196,7 +196,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
 </section>
 
 <section id="play" class="screen" aria-label="Reading room">
-  <div id="playbar"><button class="back" data-go="back">← 一覧に戻る</button><button class="back sub" data-go="#/">トップに戻る</button><div id="play-title"></div></div>
+  <div id="playbar"><button class="back" data-go="#/">← トップページに戻る</button><button class="back sub" data-go="back">一覧に戻る</button><div id="play-title"></div></div>
   <div id="loading"><div class="t">Unsealing</div><div class="bar"><i id="bar"></i></div><div class="s" id="loading-name"></div></div>
 </section>
 

@@ -193,6 +193,8 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
 #audioRoom h2{margin:12px 0 18px;font:800 clamp(19px,2.4vw,24px)/1.45 var(--mincho);color:var(--parch)}
 #audioRoom audio{width:100%}
 #audioRoom .ar-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.credit{margin:14px 0 0;text-align:center;font:400 11px/1.5 var(--mincho);letter-spacing:.06em;color:rgba(195,180,143,.55)}
+#hall-credit{margin-top:28px}
 #loading{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse,#1b2648,#0a0d17 70%)}
 #loading.on{display:flex}
 #loading .t{font:600 14px/1 var(--serif-h);letter-spacing:.3em;text-transform:uppercase;color:var(--gold-hi)}
@@ -249,6 +251,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
       <p id="hall-note"></p>
     </div>
     <div class="cards" id="cards"></div>
+    <p class="credit" id="hall-credit"></p>
   </div></div>
 </section>
 
@@ -384,6 +387,8 @@ function renderHall(c) {
   $("#hall-desc").textContent = c.desc_ja;
   $("#hall-note").textContent = c.note_ja || "";
   $("#hall-note").style.display = c.note_ja ? "" : "none";
+  $("#hall-credit").textContent = c.credit || "";   // 音声合成の利用規約によるクレジット表記（目立たせない）
+  $("#hall-credit").style.display = c.credit ? "" : "none";
   const list = catalog.games.filter(g => g.category === c.id)
     .map((g, i) => [g, i]).sort((a, b) => (a[0].pub || "9") < (b[0].pub || "9") ? -1 : (a[0].pub || "9") > (b[0].pub || "9") ? 1 : a[1] - b[1])
     .map(x => x[0]);
@@ -511,6 +516,7 @@ function openAudio(g, data) {
   blobUrl = URL.createObjectURL(new Blob([data], {type: "audio/mp4"}));
   const list = catalog.games.filter(x => x.category === g.category), i = list.findIndex(x => x.id === g.id);
   const prev = list[i - 1], next = list[i + 1];
+  const credit = (catalog.categories.find(c => c.id === g.category) || {}).credit;
   const room = document.createElement("div");
   room.id = "audioRoom";
   room.innerHTML = `<div class="ar-bg"></div><div class="ar-card">
@@ -521,7 +527,8 @@ function openAudio(g, data) {
       <div class="ar-nav">
         ${prev ? `<button class="back sub" data-go="#/play/${esc(prev.id)}">← ${esc(prev.title)}</button>` : "<span></span>"}
         ${next ? `<button class="back sub" data-go="#/play/${esc(next.id)}">${esc(next.title)} →</button>` : "<span></span>"}
-      </div></div>`;
+      </div>
+      ${credit ? `<p class="credit">${esc(credit)}</p>` : ""}</div>`;
   $("#play").appendChild(room);
   room.querySelector(".ar-bg").style.backgroundImage = `url(${catalog.bg_library})`;
   $("#loading").classList.remove("on");

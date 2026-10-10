@@ -1,6 +1,16 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- tlf-ga: Google アナリティクス（2026-10-10。どの教材がどれだけ使われたかを数える。画面の切り替えごとの送信は下の「Analytics」） -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G6PEYM8J06"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // 画面はページを読み直さずに切り替わるため、最初の自動の1回は止め、切り替えのたびに自分で送る
+  gtag('config', 'G-G6PEYM8J06', {send_page_view: false});
+</script>
+<!-- /tlf-ga -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
@@ -338,6 +348,7 @@ $("#gate-form").addEventListener("submit", async e => {
     await openCatalog();
     try { $("#remember").checked && !SHARED_ORIGIN ? localStorage.setItem(KEY_STORE, hex(raw)) : localStorage.removeItem(KEY_STORE); } catch (_) {}
     $("#pw").value = "";
+    ga("tlf_unlock", {method: "password"});
     route();
   } catch (err) {
     $("#err").textContent = "The archive could not be opened.";
@@ -457,6 +468,7 @@ $("#fb-form").addEventListener("submit", async e => {
     if (!r.ok) throw new Error(r.error || "failed");
     $("#fb-name").value = ""; $("#fb-body").value = ""; $("#fb-target").selectedIndex = 0; fbRid = newRid();
     $("#fb-thanks").textContent = fb.thanks;
+    ga("tlf_feedback_sent");
     $("#fb-form").style.display = "none"; $("#fb-done").style.display = "block";
   } catch (err) {
     console.error(err);
@@ -514,8 +526,26 @@ function openAudio(g, data) {
   room.querySelector(".ar-bg").style.backgroundImage = `url(${catalog.bg_library})`;
   $("#loading").classList.remove("on");
   const au = room.querySelector("audio");
-  au.addEventListener("ended", () => { if (next) location.hash = "#/play/" + next.id; });   // 終わったら次の定理へ
+  const label = g.title + "　" + g.detail;
+  au.addEventListener("play", () => ga("tlf_audio_play", {content_id: g.id, content_title: label}), {once: true});
+  au.addEventListener("ended", () => {
+    ga("tlf_audio_complete", {content_id: g.id, content_title: label});
+    if (next) location.hash = "#/play/" + next.id;   // 終わったら次の定理へ
+  });
   if ("mediaSession" in navigator) { try { navigator.mediaSession.metadata = new MediaMetadata({title: g.title + " " + g.detail, artist: "Theorem Learning Field"}); } catch (_) {} }
+}
+
+/* ---------- Analytics ----------
+   送るのは画面の名前（教材の題）と、入口を通った・音声を聞いた、の別だけ。
+   パスワード・ご意見の中身・お名前は送らない */
+const ga = (name, params) => { try { if (typeof gtag === "function") gtag("event", name, params || {}); } catch (_) {} };
+function track(path, title) {
+  ga("page_view", {page_location: location.origin + "/" + path, page_path: "/" + path, page_title: title});
+}
+let lastTracked = null;
+function trackRoute(path, title) {
+  if (path === lastTracked) return;   // 同じ画面の描き直しでは数えない
+  lastTracked = path; track(path, title);
 }
 
 /* ---------- Routing ---------- */
@@ -523,16 +553,20 @@ function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
 }
 function route() {
-  if (!catalog) { show("gate"); return; }
+  if (!catalog) { show("gate"); trackRoute("gate", "入口"); return; }
   const h = location.hash.replace(/^#\/?/, "");
   if (h.startsWith("play/")) {
     const g = catalog.games.find(x => x.id === h.slice(5));
-    if (g) { openGame(g); return; }
+    if (g) {
+      const c = catalog.categories.find(x => x.id === g.category);
+      trackRoute("play/" + g.id, (c ? c.ja + "：" : "") + (g.title || g.ja) + (g.detail ? "　" + g.detail : ""));
+      openGame(g); return;
+    }
   }
   closeGame();
-  if (h === "feedback" && catalog.feedback && catalog.feedback.endpoint) { renderFeedback(); show("feedback"); return; }
+  if (h === "feedback" && catalog.feedback && catalog.feedback.endpoint) { renderFeedback(); show("feedback"); trackRoute("feedback", "ご意見・ご感想"); return; }
   const c = catalog.categories.find(x => x.id === h);
-  if (c) { renderHall(c); show("hall"); } else show("field");
+  if (c) { renderHall(c); show("hall"); trackRoute(c.id, c.ja); } else { show("field"); trackRoute("", "トップ"); }
 }
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-go]"); if (!t) return;
@@ -550,7 +584,7 @@ addEventListener("hashchange", route);
   let saved = null;
   try { saved = SHARED_ORIGIN ? null : localStorage.getItem(KEY_STORE); } catch (_) {}
   if (saved) {
-    try { aesKey = await importAes(unhex(saved)); await openCatalog(); }
+    try { aesKey = await importAes(unhex(saved)); await openCatalog(); ga("tlf_unlock", {method: "saved"}); }
     catch (err) {
       aesKey = null; catalog = null;
       // 鍵が合わない（パスワードが変わった）ときだけ忘れる。通信の失敗では忘れない

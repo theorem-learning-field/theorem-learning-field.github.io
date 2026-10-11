@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- tlf-ga: Google アナリティクス（2026-10-10。どの教材がどれだけ使われたかを数える。画面の切り替えごとの送信は下の「Analytics」） -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G6PEYM8J06"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // 画面はページを読み直さずに切り替わるため、最初の自動の1回は止め、切り替えのたびに自分で送る
+  gtag('config', 'G-G6PEYM8J06', {send_page_view: false});
+</script>
+<!-- /tlf-ga -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Theorem Learning Field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0d17; --navy:#121a33; --navy2:#1b2648;
+  --gold:#d8b26a; --gold-hi:#f3dca2; --gold-lo:#8a6a32;
+  --parch:#efe4c8; --text:#f1e9d6; --muted:#c3b48f;
+  --serif-h:"Cinzel","Trajan Pro",Georgia,serif;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --mincho:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--text);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+.screen{position:fixed;inset:0;display:none;overflow:hidden}
+.screen.on{display:block}
+
+/* ---------- Gate ---------- */
+#gate{background:var(--ink)}
+#gate .gbg{position:absolute;inset:0;background:url(gate.jpg) center/cover}
+#gate .gveil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,rgba(10,13,23,.25),rgba(10,13,23,.7) 85%)}
+#gate .stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+#gate .gtitle{margin:0 0 26px;text-align:center;font:700 clamp(30px,5.6vw,64px)/1.08 var(--serif-h);letter-spacing:.06em;color:var(--parch);text-shadow:0 4px 28px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.6)}
+#gate .gtitle small{display:block;margin-top:12px;font-size:.22em;letter-spacing:.5em;color:var(--gold-hi)}
+.seal{position:relative;width:min(420px,calc(100% - 32px));margin:14px auto calc(18px + env(safe-area-inset-bottom));
+  padding:18px 20px 16px;border:1px solid var(--gold-lo);border-radius:6px;
+  background:linear-gradient(180deg,rgba(18,26,51,.92),rgba(10,13,23,.94));
+  box-shadow:0 0 0 4px rgba(10,13,23,.6),0 0 0 5px rgba(216,178,106,.35),0 18px 50px rgba(0,0,0,.6)}
+.seal:before,.seal:after{content:"";position:absolute;left:50%;width:9px;height:9px;background:var(--gold);transform:translateX(-50%) rotate(45deg)}
+.seal:before{top:-5px}.seal:after{bottom:-5px}
+.seal h2{margin:0 0 12px;text-align:center;font:600 13px/1 var(--serif-h);letter-spacing:.32em;color:var(--gold-hi);text-transform:uppercase}
+.seal form{display:flex;gap:8px}
+.seal input[type=password]{flex:1;min-width:0;padding:10px 12px;border-radius:4px;border:1px solid var(--gold-lo);
+  background:rgba(239,228,200,.06);color:var(--parch);font-size:18px;letter-spacing:.08em;outline:none}
+.seal input[type=password]:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(216,178,106,.25)}
+.btn{cursor:pointer;padding:10px 18px;border-radius:4px;border:1px solid var(--gold);
+  background:linear-gradient(180deg,#e6c47c,#a67d3c);color:#1a1206;font:700 13px/1 var(--serif-h);letter-spacing:.16em;text-transform:uppercase}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.6;cursor:wait}
+.seal .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:15px;color:var(--muted)}
+.seal label{display:flex;align-items:center;gap:6px;cursor:pointer}
+#remember-note{margin:6px 0 0;font:500 12px/1.5 var(--mincho);color:var(--muted)}
+.seal input[type=checkbox]{accent-color:var(--gold)}
+.seal .err{min-height:1.2em;color:#f0a58a;font-style:italic}
+
+
+/* ---------- Field & Hall ---------- */
+.bg{position:absolute;inset:0;background-position:center;background-size:cover;transform:scale(1.02)}
+.veil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(10,13,23,0),rgba(10,13,23,.55) 80%),linear-gradient(180deg,rgba(10,13,23,.5),rgba(10,13,23,.05) 32%,rgba(10,13,23,.7))}
+.scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wrap{max-width:1180px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.brand{font:700 clamp(15px,2.2vw,19px)/1 var(--serif-h);letter-spacing:.22em;color:var(--gold-hi);text-transform:uppercase;text-shadow:0 2px 12px rgba(0,0,0,.8);cursor:pointer;background:none;border:0;padding:0}
+.link{background:none;border:0;cursor:pointer;color:var(--muted);font:500 14px/1 var(--serif-h);letter-spacing:.14em;text-transform:uppercase;padding:6px 0}
+.link:hover{color:var(--gold-hi)}
+.back{cursor:pointer;padding:10px 18px;border-radius:24px;border:1px solid var(--gold);background:rgba(10,13,23,.72);color:var(--gold-hi);font:700 16px/1 var(--mincho);letter-spacing:.06em;white-space:nowrap;flex:none;box-shadow:0 4px 16px rgba(0,0,0,.45)}
+.back:hover,.back:focus-visible{background:rgba(216,178,106,.2);outline:none}
+.ornament{display:flex;align-items:center;gap:14px;justify-content:center;color:var(--gold);margin:6px 0 4px}
+.ornament:before,.ornament:after{content:"";height:1px;width:min(160px,22vw);background:linear-gradient(90deg,transparent,var(--gold))}
+.ornament:after{transform:scaleX(-1)}
+#bg-title-blur{filter:blur(26px) brightness(.4);transform:scale(1.1)}
+.seal-row{text-align:center;margin-top:14px}
+#seal-btn{position:relative;font-size:10.5px;letter-spacing:.16em;color:rgba(195,180,143,.5);text-shadow:none;padding:4px 2px}
+#seal-btn:hover{color:var(--muted)}
+#seal-btn:after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;
+  padding:6px 10px;border-radius:4px;border:1px solid var(--gold-lo);background:rgba(10,13,23,.95);color:var(--parch);
+  font:500 13px/1.4 var(--mincho);letter-spacing:.02em;text-transform:none;opacity:0;pointer-events:none;transition:opacity .15s}
+#seal-btn:hover:after,#seal-btn:focus-visible:after{opacity:1}
+.hero{position:relative;max-width:1671px;margin:0 auto}
+.hero img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
+.field-wrap{position:relative;padding-top:0}
+@media (min-width:761px){ .field-wrap{margin-top:max(-20vw,-330px)} .doors{margin-top:0} }
+.headline{text-align:center;margin:clamp(24px,7vh,70px) 0 10px}
+.headline h1{margin:0;font:700 clamp(28px,5.4vw,58px)/1.08 var(--serif-h);letter-spacing:.06em;color:var(--parch);text-shadow:0 4px 24px rgba(0,0,0,.85)}
+.headline p{margin:12px auto 0;display:inline-block;padding:2px 14px;background:rgba(10,13,23,.38);border-radius:20px;max-width:620px;font-size:clamp(17px,2vw,21px);font-style:italic;color:var(--muted);text-shadow:0 2px 10px rgba(0,0,0,.9)}
+
+.doors{--gap:clamp(14px,2vw,26px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);margin-top:clamp(26px,6vh,56px)}
+.doors > .door{flex:0 1 calc((100% - 2 * var(--gap)) / 3);min-width:0}
+.door{position:relative;cursor:pointer;text-align:center;padding:34px 22px 26px;border:1px solid rgba(216,178,106,.55);border-radius:140px 140px 6px 6px;
+  background:linear-gradient(180deg,rgba(27,38,72,.78),rgba(10,13,23,.9));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  box-shadow:inset 0 0 0 5px rgba(10,13,23,.55),inset 0 0 0 6px rgba(216,178,106,.25),0 20px 40px rgba(0,0,0,.45);
+  transition:transform .25s ease,box-shadow .25s ease;color:var(--text)}
+.door:hover,.door:focus-visible{transform:translateY(-4px);box-shadow:inset 0 0 0 5px rgba(10,13,23,.55),inset 0 0 0 6px rgba(216,178,106,.55),0 26px 50px rgba(0,0,0,.55),0 0 34px rgba(216,178,106,.22);outline:none}
+/* 扉が3つの列に余るときは、余りを真ん中に寄せる（flex の justify-content） */
+.door .num{font:700 15px/1 var(--serif-h);color:var(--gold);letter-spacing:.3em;margin-top:14px}
+.door h3{margin:14px 0 10px;font:700 clamp(19px,2vw,24px)/1.2 var(--serif-h);letter-spacing:.08em;color:var(--gold-hi)}
+.door p.jname{margin:0 auto;font:800 clamp(20px,2.1vw,26px)/1.3 var(--mincho);letter-spacing:.18em;color:var(--parch)}
+.door .count{display:inline-block;margin-top:16px;font:500 12px/1 var(--serif-h);letter-spacing:.24em;text-transform:uppercase;color:var(--muted);border-top:1px solid rgba(216,178,106,.35);padding-top:12px}
+
+.hall-head{text-align:center;margin:clamp(18px,5vh,44px) 0 clamp(20px,4vh,36px)}
+.hall-head .num{font:700 14px/1 var(--serif-h);color:var(--gold);letter-spacing:.34em}
+.hall-head .en{margin-top:10px;font:600 clamp(12px,1.3vw,14px)/1 var(--serif-h);letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.hall-head h1{margin:10px 0 10px;font:800 clamp(28px,4.4vw,46px)/1.2 var(--mincho);letter-spacing:.12em;color:var(--parch);text-shadow:0 4px 24px rgba(0,0,0,.85)}
+.hall-head p{margin:0 auto;display:inline-block;padding:4px 16px;background:rgba(10,13,23,.45);border-radius:20px;max-width:640px;font:500 clamp(14px,1.7vw,17px)/1.6 var(--mincho);color:var(--muted);text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.cards{display:flex;flex-direction:column;gap:14px;max-width:1040px;margin:0 auto}
+.lrow{position:relative;display:grid;grid-template-columns:150px minmax(0,1fr) auto;align-items:stretch;gap:0 22px;width:100%;min-height:150px;
+  cursor:pointer;text-align:left;color:var(--text);padding:0 26px 0 0;border:1px solid var(--gold-lo);border-radius:8px;overflow:hidden;
+  background:linear-gradient(90deg,rgba(31,43,82,.92),rgba(14,19,38,.94) 40%,rgba(10,13,23,.94));
+  box-shadow:inset 0 0 0 3px rgba(10,13,23,.5),inset 0 0 0 4px rgba(216,178,106,.22),0 12px 28px rgba(0,0,0,.45);transition:transform .2s ease,box-shadow .2s ease}
+.lrow:hover,.lrow:focus-visible{transform:translateX(4px);box-shadow:inset 0 0 0 3px rgba(10,13,23,.5),inset 0 0 0 4px rgba(216,178,106,.6),0 16px 34px rgba(0,0,0,.55),0 0 26px rgba(216,178,106,.2);outline:none}
+.lrow .pic{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(243,220,162,.25),transparent 65%)}
+.lrow .pic img{position:absolute;left:50%;top:10px;height:175%;max-width:none;transform:translateX(-50%);filter:drop-shadow(0 8px 14px rgba(0,0,0,.6));transition:transform .3s ease}
+.lrow .pic img{transform-origin:50% 0}
+#hall-note{display:block;max-width:720px;margin:14px auto 0;padding:10px 16px;border:1px solid rgba(216,178,106,.35);border-radius:6px;
+  background:rgba(10,13,23,.62);text-align:left;font:500 clamp(13px,1.5vw,15px)/1.75 var(--mincho);color:var(--text)}
+#cards h2.group{margin:22px 0 2px;text-align:center;font:800 clamp(18px,2vw,22px)/1.4 var(--mincho);letter-spacing:.14em;color:var(--gold-hi);text-shadow:0 2px 10px rgba(0,0,0,.9)}
+#cards h2.group:first-child{margin-top:0}
+#cards h2.group:before,#cards h2.group:after{content:"✦";margin:0 14px;font-size:.6em;vertical-align:middle;color:var(--gold)}
+.lrow:hover .pic img{filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) brightness(1.08)}
+.lrow .txt{align-self:center;padding:20px 0}
+.lrow h4{margin:0;font:800 clamp(21px,2.3vw,28px)/1.3 var(--mincho);letter-spacing:.04em;color:var(--parch)}
+.lrow .detail{margin:8px 0 0;font:500 clamp(14px,1.45vw,16px)/1.65 var(--mincho);color:var(--muted)}
+.lrow .meta{align-self:center;text-align:right;white-space:nowrap;font:600 15px/1.9 var(--mincho);color:var(--muted)}
+.lrow .meta .pub{font-size:16px;color:var(--gold-hi)}
+
+/* ---------- Feedback ---------- */
+.fb-entry-row{text-align:center;margin-top:clamp(22px,4vh,40px)}
+#fb-entry{display:inline-flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;min-width:min(440px,100%);padding:16px 26px 15px;border:1px solid rgba(216,178,106,.55);border-radius:6px;
+  background:linear-gradient(180deg,rgba(27,38,72,.78),rgba(10,13,23,.9));color:var(--text);
+  box-shadow:inset 0 0 0 4px rgba(10,13,23,.55),inset 0 0 0 5px rgba(216,178,106,.22),0 14px 30px rgba(0,0,0,.4);transition:transform .25s ease,box-shadow .25s ease}
+#fb-entry:hover,#fb-entry:focus-visible{transform:translateY(-3px);box-shadow:inset 0 0 0 4px rgba(10,13,23,.55),inset 0 0 0 5px rgba(216,178,106,.55),0 18px 38px rgba(0,0,0,.5),0 0 28px rgba(216,178,106,.2);outline:none}
+#fb-entry .en{font:700 clamp(16px,1.8vw,19px)/1 var(--serif-h);letter-spacing:.2em;color:var(--gold-hi)}
+#fb-entry .en:before,#fb-entry .en:after{content:"✦";margin:0 12px;font-size:.6em;vertical-align:middle;color:var(--gold)}
+#fb-entry .ja{font:800 clamp(16px,1.8vw,19px)/1.3 var(--mincho);letter-spacing:.14em;color:var(--parch)}
+.fb-card{max-width:680px;margin:0 auto;padding:24px 22px 22px;border:1px solid var(--gold-lo);border-radius:8px;
+  background:linear-gradient(180deg,rgba(27,38,72,.92),rgba(10,13,23,.95));box-shadow:inset 0 0 0 4px rgba(10,13,23,.55),inset 0 0 0 5px rgba(216,178,106,.28),0 20px 40px rgba(0,0,0,.5)}
+.fb-card label.f{display:block;margin:0 0 18px;font:700 clamp(15px,1.6vw,17px)/1.6 var(--mincho);color:var(--parch)}
+.fb-card label.f span{display:block;margin-bottom:8px}
+.fb-card input[type=text],.fb-card select,.fb-card textarea{display:block;width:100%;padding:10px 12px;border-radius:4px;border:1px solid var(--gold-lo);
+  background:rgba(239,228,200,.07);color:var(--parch);font:500 16px/1.6 var(--mincho);outline:none}
+.fb-card select option,.fb-card select optgroup{background:#121a33;color:var(--parch)}
+.fb-card textarea{min-height:220px;resize:vertical}
+.fb-card input:focus,.fb-card select:focus,.fb-card textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(216,178,106,.25)}
+.fb-card .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.fb-card .actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fb-card .btn{font:700 15px/1 var(--mincho);letter-spacing:.12em;text-transform:none;padding:12px 26px}
+#fb-msg{flex:1;min-width:0;font:500 15px/1.6 var(--mincho);color:var(--muted)}
+#fb-msg.err{color:#f0a58a}
+@media (max-width:520px){#fb-msg{flex-basis:100%}.fb-card .actions{justify-content:flex-end}}
+#fb-done{display:none;text-align:center;padding:26px 0 8px;font:700 clamp(16px,1.8vw,19px)/1.8 var(--mincho);color:var(--parch)}
+#fb-done .back{margin-top:22px}
+
+footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;font-style:italic;color:rgba(195,180,143,.8)}
+
+@media (max-width:760px){
+  .doors{max-width:440px;margin-left:auto;margin-right:auto}
+  .doors > .door{flex-basis:100%}
+  .door{border-radius:110px 110px 6px 6px;padding:26px 18px 20px}
+  .lrow{grid-template-columns:92px minmax(0,1fr);gap:0 12px;padding:0 12px 0 0;min-height:128px}
+  .lrow .meta{grid-column:2;grid-row:1;align-self:end;text-align:left;padding-top:14px;line-height:1.4;font-size:13px}
+  .lrow .meta .pub{font-size:13px}
+  .lrow .meta br{display:none}
+  .lrow .meta .pub ~ .les:before{content:"・"}
+  .lrow .pic{grid-row:1 / span 2}
+  .lrow .txt{grid-column:2;padding:4px 0 14px}
+  .lrow h4{font-size:19px}
+  .lrow .detail{font-size:12.5px;line-height:1.55}
+  .brand{font-size:12px;letter-spacing:.14em;white-space:nowrap}
+  .link{font-size:11px;white-space:nowrap}
+}
+
+/* ---------- Reading room (game) ---------- */
+#play{background:#000}
+#playbar{position:absolute;z-index:5;left:0;right:0;top:0;height:calc(52px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 10px 0;
+  display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#151d38,#0b0f1c);border-bottom:1px solid var(--gold-lo);box-shadow:0 2px 12px rgba(0,0,0,.5)}
+#playbar .back{padding:9px 16px;font-size:15px;flex:none}
+#playbar .back.sub{border-color:var(--gold-lo);color:var(--muted)}
+#play-title{flex:1;min-width:0;text-align:right;font:700 15px/1.2 var(--mincho);color:var(--gold-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px}
+#play iframe{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));width:100%;height:calc(100% - 52px - env(safe-area-inset-top));border:0;background:#000}
+@media (max-width:520px){#playbar{gap:6px}#playbar .back{padding:8px 10px;font-size:13px;letter-spacing:.02em}#play-title{display:none}}
+#audioRoom{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));overflow:auto}
+#audioRoom .ar-bg{position:absolute;inset:0;background-position:center;background-size:cover;filter:brightness(.38)}
+#audioRoom .ar-card{position:relative;max-width:560px;margin:clamp(20px,6vh,60px) auto;padding:26px 22px 22px;text-align:center;border:1px solid var(--gold-lo);border-radius:8px;
+  background:linear-gradient(180deg,rgba(27,38,72,.9),rgba(10,13,23,.94));box-shadow:inset 0 0 0 4px rgba(10,13,23,.55),inset 0 0 0 5px rgba(216,178,106,.3),0 20px 40px rgba(0,0,0,.5)}
+#audioRoom .ar-sage{height:clamp(150px,30vh,260px);filter:drop-shadow(0 10px 18px rgba(0,0,0,.55))}
+#audioRoom .ar-num{margin-top:10px;font:700 15px/1 var(--serif-h);letter-spacing:.3em;color:var(--gold)}
+#audioRoom h2{margin:12px 0 18px;font:800 clamp(19px,2.4vw,24px)/1.45 var(--mincho);color:var(--parch)}
+#audioRoom audio{width:100%}
+#audioRoom .ar-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.credit{margin:14px 0 0;text-align:center;font:400 11px/1.5 var(--mincho);letter-spacing:.06em;color:rgba(195,180,143,.55)}
+#hall-credit{margin-top:28px}
+.books-tools{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;margin:0 auto 6px;max-width:1040px}
+.books-tools input{flex:1 1 260px;max-width:420px;min-width:0;padding:10px 14px;border-radius:22px;border:1px solid var(--gold-lo);
+  background:rgba(10,13,23,.8);color:var(--parch);font:500 15px/1.2 var(--mincho)}
+.books-tools input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(216,178,106,.25)}
+.books-tools .hits{font:500 13px/1 var(--mincho);color:var(--muted)}
+.book-panel{display:flex;flex-direction:column;gap:2px}
+/* 一冊ずつ、紙の白に墨の字。左の濃い帯は本の背 */
+.book{display:flex;align-items:baseline;gap:10px;padding:10px 16px 10px 14px;border:1px solid #cdbb94;border-left:5px solid #7a5a2e;border-radius:2px 4px 4px 2px;
+  background:linear-gradient(90deg,#efe6cf,#f8f2e3 18%,#f6efdd);box-shadow:0 1px 3px rgba(0,0,0,.45);
+  color:#2a2015;text-decoration:none;font:700 clamp(14.5px,1.6vw,16px)/1.6 "Zen Old Mincho",var(--mincho);letter-spacing:.02em;transition:background .15s ease,transform .15s ease}
+.book:hover,.book:focus-visible{background:linear-gradient(90deg,#f3ead2,#fffaee 18%,#fdf6e6);transform:translateX(2px);outline:none}
+.book .t{flex:1;min-width:0}
+.book .ico{flex:none;align-self:flex-start;width:15px;height:17px;margin-top:calc((1.6em - 17px) / 2);color:#7a5a2e}
+.book .role{flex:none;padding:0 8px;border:1px solid #9a7a48;border-radius:9px;font:600 11.5px/1.6 var(--mincho);color:#6b4c22}
+#cards.books{gap:8px}
+#books-list{gap:1px}
+.series-list{display:flex;flex-direction:column;gap:6px}
+.series{display:block;padding:14px 18px;border:1px solid var(--gold-lo);border-radius:6px;background:rgba(10,13,23,.84);color:var(--text);text-decoration:none;text-align:left;cursor:pointer;width:100%;
+  font:inherit;transition:border-color .15s ease,background .15s ease}
+.series:hover,.series:focus-visible{border-color:var(--gold);background:rgba(27,38,72,.9);outline:none}
+.series .st{display:block;font:700 clamp(15.5px,1.8vw,18px)/1.5 var(--mincho);color:var(--parch)}
+.series .sd{display:block;margin-top:3px;font:500 13px/1.6 var(--mincho);color:var(--muted)}
+.series .sn{display:inline-block;margin-top:6px;font:600 11.5px/1 var(--serif-h);letter-spacing:.18em;color:var(--gold)}
+.series.unofficial .st:after{content:"非公式";margin-left:8px;padding:0 7px;border:1px solid var(--gold-lo);border-radius:9px;font:600 11px/1.6 var(--mincho);color:var(--gold-hi);vertical-align:2px}
+.mplayer{position:relative;width:100%;max-width:860px;margin:0 auto 4px;aspect-ratio:16/9;border:1px solid var(--gold-lo);border-radius:6px;overflow:hidden;background:#000}
+.mplayer iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.mlinks{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:6px 0 8px}
+.mlinks a{padding:7px 14px;border-radius:18px;border:1px solid var(--gold-lo);background:rgba(10,13,23,.72);color:var(--gold-hi);font:600 13px/1.2 var(--mincho);text-decoration:none}
+.mlinks a:hover{border-color:var(--gold)}
+.vlist{display:flex;flex-direction:column;gap:2px;max-width:860px;width:100%;margin:0 auto}
+.vrow{display:flex;align-items:baseline;gap:10px;width:100%;padding:9px 14px;border:1px solid rgba(216,178,106,.28);border-radius:3px;background:rgba(10,13,23,.82);
+  color:var(--parch);text-align:left;cursor:pointer;font:600 14px/1.55 var(--mincho);text-decoration:none}
+.vrow:hover,.vrow:focus-visible{border-color:var(--gold);outline:none}
+.vrow.on{border-color:var(--gold);background:rgba(216,178,106,.18)}
+.vrow .pl{flex:none;color:var(--gold);font-size:11px}
+.vrow .vt{flex:1;min-width:0}
+.vrow .vc{display:block;margin-top:2px;font:500 12px/1.4 var(--mincho);color:var(--muted)}
+.mextra{max-width:860px;width:100%;margin:18px auto 0}
+.lsec{max-width:860px;width:100%;margin:0 auto 18px}
+.lsec h3{display:flex;align-items:center;gap:10px;margin:0 0 6px 2px;font:700 13.5px/1.4 var(--mincho);letter-spacing:.08em;color:var(--gold-hi)}
+.lsec h3:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(216,178,106,.55),transparent)}
+/* メディア：動画らしく、サムネイルを並べる */
+.series{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:center;padding:10px}
+.series .sthumb{position:relative;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:#000 center/cover no-repeat;box-shadow:0 2px 8px rgba(0,0,0,.6)}
+.series .sthumb:after{content:"";position:absolute;left:50%;top:50%;width:30px;height:21px;margin:-10.5px 0 0 -15px;border-radius:6px;background:rgba(0,0,0,.65)}
+.series .sthumb:before{content:"";position:absolute;z-index:1;left:50%;top:50%;margin:-6px 0 0 -3px;border-left:10px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.series .sthumb.ext{background:linear-gradient(135deg,#1b2648,#0a0d17)}
+.series .sthumb.ext:before{content:"↗";border:0;margin:0;transform:translate(-50%,-50%);font:700 22px/1 var(--mincho);color:var(--gold-hi)}
+.series .sthumb.ext:after{content:none}
+.series .stext{min-width:0}
+.vrow.vid{align-items:center;padding:6px 10px 6px 6px;gap:12px}
+.vrow.vid .vthumb{flex:none;width:120px;aspect-ratio:16/9;border-radius:3px;background:#000 center/cover no-repeat}
+.vrow.vid .pl{display:none}
+.vrow.vid.on .vthumb{outline:2px solid var(--gold);outline-offset:-2px}
+.vrow.vid.on .vt:before{content:"再生中";display:inline-block;margin-right:6px;padding:0 6px;border-radius:3px;background:var(--gold);color:#0a0d17;font:700 11px/1.7 var(--mincho);vertical-align:1px}
+@media (max-width:520px){.series{grid-template-columns:104px minmax(0,1fr);gap:10px}.vrow.vid .vthumb{width:96px}.vrow.vid{font-size:13px}}
+/* 機能音源：音の行（イコライザーの印・CDの円盤・アプリのアイコン） */
+.trk{display:flex;align-items:center;gap:14px;padding:10px 14px;border:1px solid rgba(216,178,106,.3);border-radius:22px;
+  background:linear-gradient(90deg,rgba(44,30,70,.9),rgba(14,16,34,.92));color:var(--parch);text-decoration:none;transition:border-color .15s ease,background .15s ease}
+.trk:hover,.trk:focus-visible{border-color:var(--gold);outline:none;background:linear-gradient(90deg,rgba(64,42,98,.95),rgba(20,22,46,.95))}
+.trk .eq{flex:none;display:flex;align-items:flex-end;justify-content:center;gap:3px;width:40px;height:40px;padding:9px 0;border-radius:50%;border:1px solid var(--gold-lo);background:rgba(10,13,23,.7);box-sizing:border-box}
+.trk .eq i{display:block;width:3px;border-radius:2px;background:var(--gold-hi);height:40%}
+.trk .eq i:nth-child(2){height:85%}.trk .eq i:nth-child(3){height:60%}.trk .eq i:nth-child(4){height:100%}.trk .eq i:nth-child(5){height:45%}
+@keyframes eqb{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1)}}
+.trk:hover .eq i{animation:eqb .9s ease-in-out infinite;transform-origin:bottom}
+.trk:hover .eq i:nth-child(2){animation-delay:-.3s}.trk:hover .eq i:nth-child(3){animation-delay:-.6s}.trk:hover .eq i:nth-child(4){animation-delay:-.15s}.trk:hover .eq i:nth-child(5){animation-delay:-.45s}
+.trk .disc{flex:none;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,#0a0d17 0 4px,#c9ccd6 5px 7px,transparent 8px),conic-gradient(from 30deg,#e9ecf3,#9aa3b8,#f4f1e6,#a7b0c4,#e9ecf3);box-shadow:0 1px 4px rgba(0,0,0,.6)}
+.trk:hover .disc{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.trk .appicon{flex:none;width:44px;height:44px;border-radius:11px;box-shadow:0 1px 4px rgba(0,0,0,.6)}
+.trk .tt{flex:1;min-width:0;font:700 14.5px/1.55 var(--mincho)}
+.trk .tt small{display:block;margin-top:2px;font:500 12px/1.4 var(--mincho);color:var(--muted)}
+.trk .price{flex:none;padding:2px 10px;border-radius:12px;border:1px solid var(--gold-lo);font:700 12px/1.5 var(--mincho);color:var(--gold-hi);white-space:nowrap}
+.trk .price.free{background:rgba(216,178,106,.2)}
+.tlist{display:flex;flex-direction:column;gap:6px}
+/* 公式コンテンツ：公式の名札（サイトのアイコン・ドメイン・「公式」の印） */
+.otiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:640px){.otiles{grid-template-columns:minmax(0,1fr)}}
+.otile{position:relative;display:flex;align-items:center;gap:12px;padding:18px 14px 12px;border:1px solid rgba(216,178,106,.45);border-radius:6px;
+  background:linear-gradient(180deg,rgba(27,38,72,.88),rgba(10,13,23,.92));color:var(--parch);text-decoration:none;transition:border-color .15s ease,transform .15s ease}
+.otile:hover,.otile:focus-visible{border-color:var(--gold);transform:translateY(-1px);outline:none}
+.otile .fav{flex:none;width:36px;height:36px;border-radius:8px;background:#fff center/24px no-repeat;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.otile .fav.none{display:flex;align-items:center;justify-content:center;background:#efe6cf;color:#7a5a2e;font:800 16px/1 var(--mincho)}
+.otile .ot{flex:1;min-width:0;font:700 14px/1.5 var(--mincho)}
+.otile .od{display:block;margin-top:2px;font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.otile .sub{display:block;font:500 12px/1.4 var(--mincho);color:var(--muted)}
+.otile .oseal{position:absolute;top:-1px;right:10px;padding:1px 7px 2px;border-radius:0 0 4px 4px;background:var(--gold);color:#0a0d17;font:700 10.5px/1.4 var(--mincho);letter-spacing:.1em}
+.mextra h3{margin:0 0 4px 4px;font:600 13px/1.4 var(--mincho);color:var(--gold)}
+.mextra p{margin:0 0 6px 4px;font:500 12.5px/1.6 var(--mincho);color:var(--muted)}
+#books-list h2.group{margin:6px 0 0 4px;text-align:left;font:600 12.5px/1.2 var(--mincho);letter-spacing:.08em;color:var(--gold);text-shadow:0 1px 6px rgba(0,0,0,.9)}
+#books-list h2.group:first-child{margin-top:0}
+#books-list h2.group:before,#books-list h2.group:after{content:none}
+@media (max-width:520px){.book{padding:10px 14px}}
+#hall-mode{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:720px;margin:14px auto 0}
+#hall-mode button{cursor:pointer;padding:7px 14px;border-radius:18px;border:1px solid var(--gold-lo);background:rgba(10,13,23,.62);
+  color:var(--muted);font:600 13px/1.2 var(--mincho);letter-spacing:.04em}
+#hall-mode button[aria-pressed=true]{border-color:var(--gold);background:rgba(216,178,106,.22);color:var(--gold-hi)}
+#loading{position:absolute;left:0;right:0;bottom:0;top:calc(52px + env(safe-area-inset-top));z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse,#1b2648,#0a0d17 70%)}
+#loading.on{display:flex}
+#loading .t{font:600 14px/1 var(--serif-h);letter-spacing:.3em;text-transform:uppercase;color:var(--gold-hi)}
+#loading .bar{width:min(320px,70vw);height:3px;background:rgba(216,178,106,.2);border-radius:2px;overflow:hidden}
+#loading .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi));transition:width .15s}
+#loading .s{font-style:italic;color:var(--muted)}
+
+</style>
+</head>
+<body>
+
+<section id="gate" class="screen on" aria-label="Gate">
+  <div class="gbg"></div><div class="gveil"></div>
+  <div class="stage">
+    <h1 class="gtitle">Theorem<br>Learning Field<small>✦</small></h1>
+    <div class="seal">
+      <h2>Speak the Word</h2>
+      <form id="gate-form" autocomplete="off">
+        <input id="pw" type="password" autocomplete="current-password" aria-label="Password" placeholder="Password">
+        <button class="btn" id="enter" type="submit">Enter</button>
+      </form>
+      <div class="row">
+        <label id="remember-label"><input type="checkbox" id="remember" checked> Remember this device</label>
+        <p id="remember-note">共用の端末では、チェックを外してください。</p>
+        <span class="err" id="err"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="field" class="screen" aria-label="The Field">
+  <div class="bg" id="bg-title-blur"></div><div class="veil"></div>
+  <div class="scroll">
+    <div class="hero"><img id="hero-img" alt="Theorem Learning Field"></div>
+    <div class="wrap field-wrap">
+    <div class="doors" id="doors"></div>
+    <div class="fb-entry-row"><button id="fb-entry" data-go="#/feedback" hidden><span class="en"></span><span class="ja"></span></button></div>
+    <footer class="note" id="footer-note"></footer>
+    <div class="seal-row"><button class="link" id="seal-btn" data-tip="保存したパスワードをクリアします">Seal the Field</button></div>
+  </div></div>
+</section>
+
+<section id="hall" class="screen" aria-label="Hall">
+  <div class="bg" id="bg-library"></div><div class="veil"></div>
+  <div class="scroll"><div class="wrap">
+    <header class="top">
+      <button class="back" id="hall-back" data-go="#/">← トップページに戻る</button>
+      <button class="brand" data-go="#/">Theorem Learning Field</button>
+    </header>
+    <div class="hall-head">
+      <div class="num" id="hall-num"></div>
+      <div class="en" id="hall-en"></div>
+      <h1 id="hall-title"></h1>
+      <p id="hall-desc"></p>
+      <p id="hall-note"></p>
+      <div id="hall-mode" role="group" aria-label="再生のしかた"></div>
+    </div>
+    <div class="cards" id="cards"></div>
+    <p class="credit" id="hall-credit"></p>
+  </div></div>
+</section>
+
+<section id="feedback" class="screen" aria-label="Feedback">
+  <div class="bg" id="bg-library-fb"></div><div class="veil"></div>
+  <div class="scroll"><div class="wrap">
+    <header class="top">
+      <button class="back" data-go="#/">← トップページに戻る</button>
+      <button class="brand" data-go="#/">Theorem Learning Field</button>
+    </header>
+    <div class="hall-head"><div class="en" id="fb-en"></div><h1 id="fb-title"></h1></div>
+    <div class="fb-card">
+      <form id="fb-form" autocomplete="off" novalidate>
+        <label class="f"><span id="fb-name-label"></span><input type="text" id="fb-name" maxlength="100"></label>
+        <label class="f"><span id="fb-target-label"></span><select id="fb-target"></select></label>
+        <label class="f"><span id="fb-body-label"></span><textarea id="fb-body" maxlength="10000"></textarea></label>
+        <div class="hp" aria-hidden="true"><input type="text" id="fb-website" tabindex="-1" autocomplete="off"></div>
+        <div class="actions"><span id="fb-msg" role="status"></span><button class="btn" id="fb-send" type="submit"></button></div>
+      </form>
+      <div id="fb-done"><div id="fb-thanks"></div><button class="back" data-go="#/">← トップページに戻る</button></div>
+    </div>
+  </div></div>
+</section>
+
+<section id="play" class="screen" aria-label="Reading room">
+  <div id="playbar"><button class="back" data-go="#/">← トップページに戻る</button><button class="back sub" data-go="back">一覧に戻る</button><div id="play-title"></div></div>
+  <div id="loading"><div class="t">Unsealing</div><div class="bar"><i id="bar"></i></div><div class="s" id="loading-name"></div></div>
+</section>
+
+
+<script>
+"use strict";
+// 他のサイトの枠の中では開かない
+if (window.top !== window.self) { document.documentElement.innerHTML = ""; throw new Error("framed"); }
+const SALT = "92f3313c63876f2475c283d7817d983b", ITER = 600000, VERIFY = "b9a2cf3b1bf5dd6669e719f478a4e38bca36a4beca6a09908ba7b204a3a90461";
+const KEY_STORE = "tlf_key";
+// github.io のプロジェクトページ（/リポジトリ名/ の下）は、同じアカウントの他のページと保存領域を共有する。
+// その場合は鍵をこの端末に覚えない（他のページのプログラムから鍵が読めてしまうため）。
+const SHARED_ORIGIN = /\.github\.io$/.test(location.hostname) && location.pathname.split("/")[1] !== "";
+if (SHARED_ORIGIN) { try { localStorage.removeItem(KEY_STORE); } catch (_) {} }
+const $ = s => document.querySelector(s);
+const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+const unhex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)));
+let aesKey = null, catalog = null, blobUrl = null;
+
+async function derive(pw) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: unhex(SALT), iterations: ITER, hash: "SHA-256"}, base, 512);
+  const enc = bits.slice(0, 32), mac = bits.slice(32);
+  const macKey = await crypto.subtle.importKey("raw", mac, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", macKey, new TextEncoder().encode("theorem-learning-field"));
+  return hex(sig) === VERIFY ? enc : null;
+}
+const importAes = raw => crypto.subtle.importKey("raw", raw, "AES-CBC", false, ["decrypt"]);
+async function decrypt(buf) {
+  return crypto.subtle.decrypt({name: "AES-CBC", iv: buf.slice(0, 16)}, aesKey, buf.slice(16));
+}
+async function fetchBin(url, onProgress) {
+  const res = await fetch(url, {cache: "no-cache"});
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const total = +res.headers.get("content-length") || 0;
+  if (!res.body || !total || !onProgress) return res.arrayBuffer();
+  const reader = res.body.getReader(), parts = []; let got = 0;
+  for (;;) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    parts.push(value); got += value.length; onProgress(got / total);
+  }
+  const out = new Uint8Array(got); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out.buffer;
+}
+async function openCatalog() {
+  // 一覧と絵は別のファイル（一覧を直しても絵を配り直さない）。届いたら絵を一覧に戻す
+  const [buf, abuf] = await Promise.all([fetchBin("data/catalog.bin"), fetchBin("data/art.bin")]);
+  catalog = JSON.parse(new TextDecoder().decode(await decrypt(buf)));
+  const art = JSON.parse(new TextDecoder().decode(await decrypt(abuf)));
+  catalog.title_art = art.title_art; catalog.bg_library = art.bg_library;
+  catalog.games.forEach(g => { g.card = art.cards[g.card] || ""; });
+  $("#bg-title-blur").style.backgroundImage = `url(${catalog.title_art})`;
+  $("#hero-img").src = catalog.title_art;
+  $("#bg-library").style.backgroundImage = `url(${catalog.bg_library})`;
+  $("#bg-library-fb").style.backgroundImage = `url(${catalog.bg_library})`;
+  $("#footer-note").textContent = catalog.footer_en || "";
+  renderDoors();
+  const fb = catalog.feedback || {};
+  $("#fb-entry").hidden = !fb.endpoint;
+  $("#fb-entry .en").textContent = fb.en || "";
+  $("#fb-entry .ja").textContent = fb.ja || "";
+}
+
+/* ---------- Gate ---------- */
+$("#gate-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const pw = $("#pw").value; if (!pw) return;
+  $("#enter").disabled = true; $("#err").textContent = "";
+  try {
+    const raw = await derive(pw);
+    if (!raw) { $("#err").textContent = "The seal does not yield."; return; }
+    aesKey = await importAes(raw);
+    await openCatalog();
+    try { $("#remember").checked && !SHARED_ORIGIN ? localStorage.setItem(KEY_STORE, hex(raw)) : localStorage.removeItem(KEY_STORE); } catch (_) {}
+    $("#pw").value = "";
+    ga("tlf_unlock", {method: "password"});
+    route();
+  } catch (err) {
+    $("#err").textContent = "The archive could not be opened.";
+    console.error(err);
+  } finally { $("#enter").disabled = false; }
+});
+$("#seal-btn").addEventListener("click", () => {
+  if (!confirm("この端末に保存したパスワードを消します。次に開くときは、もう一度パスワードを入れます。\n（学習の記録は消えません）")) return;
+  try { localStorage.removeItem(KEY_STORE); } catch (_) {}
+  aesKey = null; catalog = null; location.hash = "#/"; show("gate");
+});
+
+/* ---------- Rendering ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const word = n => ["Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve"][n] || ({20:"Twenty",30:"Thirty",40:"Forty"}[n]) || n;
+const mmss = sec => Math.floor(sec / 60) + "分" + String(sec % 60).padStart(2, "0") + "秒";
+function renderDoors() {
+  $("#doors").innerHTML = catalog.categories.map(c => {
+    const n = c.kind === "books" ? (catalog.books || []).length : c.kind === "media" ? (catalog.media || []).length : c.kind === "links" ? (c.sections || []).reduce((a, x) => a + x.items.length, 0) : catalog.games.filter(g => g.category === c.id).length;
+    const unit = c.kind === "books" ? (n === 1 ? "Book" : "Books") : c.kind === "media" ? "Series" : c.kind === "links" ? (n === 1 ? "Link" : "Links") : c.id === "quests" ? (n === 1 ? "Quest" : "Quests") : c.id === "audio" ? (n === 1 ? "Recording" : "Recordings") : (n === 1 ? "Lecture" : "Lectures");
+    return `<button class="door" data-go="#/${esc(c.id)}">
+      <div class="ornament">✦</div><div class="num">${esc(c.numeral)}</div>
+      <h3>${esc(c.en)}</h3>
+      <p class="jname">${esc(c.ja)}</p>
+      <span class="count">${word(n)} ${unit}</span></button>`;
+  }).join("");
+}
+const isPhone = () => matchMedia("(max-width: 760px) and (pointer: coarse)").matches;
+function renderHall(c) {
+  $("#hall-num").textContent = c.numeral;
+  $("#hall-en").textContent = c.en;
+  $("#hall-title").textContent = c.ja;
+  $("#hall-desc").textContent = c.desc_ja;
+  $("#hall-note").textContent = c.note_ja || "";
+  $("#hall-note").style.display = c.note_ja ? "" : "none";
+  $("#hall-credit").textContent = c.credit || "";   // 音声合成の利用規約によるクレジット表記（目立たせない）
+  $("#hall-credit").style.display = c.credit ? "" : "none";
+  renderPlayMode(c);
+  $("#cards").classList.toggle("books", c.kind === "books");
+  $("#hall-back").dataset.go = "#/"; $("#hall-back").textContent = "← トップページに戻る";
+  if (c.kind === "books") { renderBooks(); $("#hall .scroll").scrollTop = 0; return; }
+  if (c.kind === "media") { renderMediaIndex(); $("#hall .scroll").scrollTop = 0; return; }
+  if (c.kind === "links") { renderLinks(c); $("#hall .scroll").scrollTop = 0; return; }
+  const list = catalog.games.filter(g => g.category === c.id)
+    .map((g, i) => [g, i]).sort((a, b) => (a[0].pub || "9") < (b[0].pub || "9") ? -1 : (a[0].pub || "9") > (b[0].pub || "9") ? 1 : a[1] - b[1])
+    .map(x => x[0]);
+  const row = g => {
+    const pub = g.pub ? `<span class="pub">${esc(g.pub.replace(/-/g, "/"))} 公開</span><br>` : "";
+    const les = g.duration ? `<span class="les">${mmss(g.duration)}</span>` : g.lessons ? `<span class="les">${g.lessons}${esc(g.unit || "コマ")}</span>` : "";
+    return `<button class="lrow" data-go="#/play/${esc(g.id)}">
+      <div class="pic${g.pic_fit === "whole" ? " whole" : ""}"><img src="${g.card}" alt=""></div>
+      <div class="txt"><h4>${esc(g.title || g.ja)}</h4><p class="detail">${esc(g.detail || g.sub_ja)}</p></div>
+      <div class="meta">${pub}${les}</div></button>`;
+  };
+  // 見出し（group）があれば、見出しごとにまとめて並べる
+  const groups = [];
+  list.forEach(g => { const k = g.group || ""; let x = groups.find(y => y.k === k); if (!x) groups.push(x = {k, items: []}); x.items.push(g); });
+  $("#cards").innerHTML = groups.map(x => (x.k ? `<h2 class="group">${esc(x.k)}</h2>` : "") + x.items.map(row).join("")).join("");
+  $("#hall .scroll").scrollTop = 0;
+  // 画面に出てから寸法を測る（出る前は枠の大きさが0のため）
+  requestAnimationFrame(() => document.querySelectorAll("#cards .pic img").forEach(img => img.complete ? fitPic(img) : img.addEventListener("load", () => fitPic(img), {once: true})));
+}
+
+/* 書籍一覧：刊行の新しい順・年ごとの見出し・書名で絞り込み。押すと Amazon を別のタブで開く */
+function renderBooks() {
+  const books = catalog.books || [];
+  const ROLE = {"共著": "共著", "監修": "監修", "訳": "訳", "解説": "解説"};
+  // 書名の頭の印（閉じた本の形）
+  const BOOK_ICON = `<svg class="ico" viewBox="0 0 15 17" aria-hidden="true"><path d="M2.5 1.5h9.5v12H3.6a1.6 1.6 0 0 0 0 3.2H12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2.5 1.5v13.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.2 5h4.6" stroke="currentColor" stroke-width="1.1"/></svg>`;
+  const row = b => `<a class="book" href="${esc(b.url)}" target="_blank" rel="noopener noreferrer" data-book="${esc(b.title)}">${BOOK_ICON}<span class="t">${esc(b.title)}</span>${ROLE[b.role] ? `<span class="role">${ROLE[b.role]}</span>` : ""}</a>`;
+  const draw = q => {
+    const key = q.trim().toLowerCase();
+    const hit = books.filter(b => !key || b.title.toLowerCase().includes(key));
+    const groups = [];
+    hit.forEach(b => { const k = b.year ? b.year + "年" : "刊行年不明"; let x = groups.find(y => y.k === k); if (!x) groups.push(x = {k, items: []}); x.items.push(b); });
+    $("#books-list").innerHTML = groups.map(x => `<h2 class="group">${esc(x.k)}</h2><div class="book-panel">` + x.items.map(row).join("") + `</div>`).join("")
+      || `<p class="books-none">見つかりませんでした。</p>`;
+    $("#books-hits").textContent = key ? `${hit.length} 冊` : `全 ${books.length} 冊`;
+  };
+  $("#cards").innerHTML = `<div class="books-tools"><input id="books-q" type="search" placeholder="書名で探す" aria-label="書名で探す"><span class="hits" id="books-hits"></span></div>
+    <div id="books-list" class="cards books"></div>`;
+  $("#books-q").addEventListener("input", e => draw(e.target.value));
+  draw("");
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-book]");
+  if (a) ga("tlf_book_click", {content_title: a.dataset.book});
+});
+
+/* メディア：シリーズの一覧 → シリーズのページ（YouTube を続けて再生）。
+   埋め込みは youtube-nocookie。参照元を送らないとYouTubeが再生を断るため、iframe だけ参照元の送り方を変える */
+const ytThumb = id => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+function renderMediaIndex() {
+  $("#cards").innerHTML = `<div class="series-list">` + (catalog.media || []).map(s =>
+    `<button class="series${s.unofficial ? " unofficial" : ""}" data-go="#/media/${esc(s.id)}">` +
+    (s.videos.length ? `<span class="sthumb" style="background-image:url(${ytThumb(s.videos[0].id)})"></span>` : `<span class="sthumb ext"></span>`) +
+    `<span class="stext"><span class="st">${esc(s.title)}</span><span class="sd">${esc(s.desc)}</span>` +
+    `<span class="sn">${s.videos.length ? s.videos.length + " VIDEOS" : s.links.length + " LINKS"}</span></span></button>`).join("") + `</div>`;
+}
+function renderSeries(s) {
+  const c = catalog.categories.find(x => x.kind === "media") || {};
+  $("#hall-num").textContent = c.numeral || "";
+  $("#hall-en").textContent = c.en || "";
+  $("#hall-title").textContent = s.title;
+  $("#hall-desc").textContent = s.desc;
+  $("#hall-note").textContent = s.note || "";
+  $("#hall-note").style.display = s.note ? "" : "none";
+  $("#hall-credit").style.display = "none";
+  $("#hall-mode").style.display = "none";
+  $("#hall-back").dataset.go = "#/" + (c.id || "media"); $("#hall-back").textContent = "← メディアに戻る";
+  $("#cards").classList.remove("books");
+  const links = s.links.length ? `<div class="mlinks">` + s.links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)} ↗</a>`).join("") + `</div>` : "";
+  if (!s.videos.length) {   // 非公式など、ページの中では流さないもの
+    $("#cards").innerHTML = `<div class="vlist">` + s.links.map(l => `<a class="vrow" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"><span class="pl">↗</span><span class="vt">${esc(l.label)}</span></a>`).join("") + `</div>`;
+    $("#hall .scroll").scrollTop = 0;
+    return;
+  }
+  $("#cards").innerHTML = `<div class="mplayer"></div>${links}<div class="vlist">` + s.videos.map((v, i) =>
+    `<button class="vrow vid" data-vi="${i}"><span class="vthumb" data-bg="${ytThumb(v.id)}"></span><span class="pl">▶</span><span class="vt">${esc(v.title)}${s.show_channel && v.ch ? `<span class="vc">${esc(v.ch)}</span>` : ""}</span></button>`).join("") + `</div>` +
+    (s.extra ? `<div class="mextra"><h3>${esc(s.extra.heading)}</h3>${s.extra.note ? `<p>${esc(s.extra.note)}</p>` : ""}<div class="vlist">` +
+      s.extra.links.map(l => `<a class="vrow" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"><span class="pl">↗</span><span class="vt">${esc(l.label)}</span></a>`).join("") + `</div></div>` : "");
+  const play = (i, auto) => {
+    // 押した動画から後ろを続けて流す（YouTube の playlist 指定は長すぎると効かないため、150本まで）
+    const ids = s.videos.slice(i, i + 150).map(v => v.id);
+    const f = document.createElement("iframe");
+    f.src = `https://www.youtube-nocookie.com/embed/${ids[0]}?playlist=${ids.slice(1).join(",")}&rel=0&playsinline=1${auto ? "&autoplay=1" : ""}`;
+    f.referrerPolicy = "strict-origin-when-cross-origin";
+    f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; f.allowFullscreen = true;
+    f.title = s.videos[i].title;
+    $("#cards .mplayer").replaceChildren(f);
+    $("#cards").querySelectorAll(".vrow").forEach(r => r.classList.toggle("on", +r.dataset.vi === i));
+    if (auto) ga("tlf_media_play", {content_id: s.id, content_title: s.title + "：" + s.videos[i].title});
+  };
+  $("#cards").querySelectorAll(".vrow").forEach(r => r.addEventListener("click", () => {
+    play(+r.dataset.vi, true);
+    $("#cards .mplayer").scrollIntoView({behavior: "smooth", block: "start"});
+  }));
+  play(0, false);
+  $("#hall .scroll").scrollTop = 0;
+  // サムネイルは画面に近づいてから読み込む（数百本のシリーズでも重くしない）
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.style.backgroundImage = `url(${e.target.dataset.bg})`; io.unobserve(e.target);
+  }), {root: $("#hall .scroll"), rootMargin: "400px"});
+  $("#cards").querySelectorAll(".vthumb[data-bg]").forEach(t => io.observe(t));
+}
+
+/* 外へのリンクの扉（機能音源など）：見出しごとに、押すと別のタブで開く行を並べる */
+function renderLinks(c) {
+  const attrs = it => `href="${esc(it.url)}" target="_blank" rel="noopener noreferrer" data-link="${esc(c.ja + "：" + it.title)}"`;
+  const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (_) { return ""; } };
+  let row;
+  if (c.style === "sounds") {
+    // 機能音源：記事は音の印、アプリはアイコン、書籍はCDの円盤。値段は右の札に
+    row = (it, look) => {
+      const m = /^(有料\s*[\d,]+円|無料[^／]*)$/.exec(it.sub || "");
+      const mark = look === "app" && it.icon ? `<img class="appicon" src="${it.icon}" alt="">` : look === "book" ? `<span class="disc"></span>` : `<span class="eq"><i></i><i></i><i></i><i></i><i></i></span>`;
+      return `<a class="trk" ${attrs(it)}>${mark}<span class="tt">${esc(it.title)}${it.sub && !m ? `<small>${esc(it.sub)}</small>` : ""}</span>` +
+        (m ? `<span class="price${/^無料/.test(m[1]) ? " free" : ""}">${esc(m[1].replace(/^有料\s*/, ""))}</span>` : "") + `</a>`;
+    };
+    $("#cards").innerHTML = (c.sections || []).map(x => `<div class="lsec"><h3>${esc(x.heading)}</h3><div class="tlist">` + x.items.map(it => row(it, x.look)).join("") + `</div></div>`).join("");
+    return;
+  }
+  if (c.style === "official") {
+    // 公式コンテンツ：サイトのアイコン・ドメイン・「公式」の印の名札
+    row = it => `<a class="otile" ${attrs(it)}><span class="oseal">公式</span>` +
+      (it.icon ? `<span class="fav" style="background-image:url(${it.icon})"></span>` : `<span class="fav none">${esc(it.title.slice(0, 1))}</span>`) +
+      `<span class="ot">${esc(it.title)}${it.sub && !it.sub.includes(".") ? `<span class="sub">${esc(it.sub)}</span>` : ""}<span class="od">${esc(host(it.url))}</span></span></a>`;
+    $("#cards").innerHTML = (c.sections || []).map(x => `<div class="lsec"><h3>${esc(x.heading)}</h3><div class="otiles">` + x.items.map(row).join("") + `</div></div>`).join("");
+    return;
+  }
+  $("#cards").innerHTML = (c.sections || []).map(x => `<div class="lsec"><h3>${esc(x.heading)}</h3><div class="vlist">` +
+    x.items.map(it => `<a class="vrow" ${attrs(it)}><span class="pl">↗</span>` +
+      `<span class="vt">${esc(it.title)}${it.sub ? `<span class="vc">${esc(it.sub)}</span>` : ""}</span></a>`).join("") + `</div></div>`).join("");
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-link]");
+  if (a) ga("tlf_link_click", {content_title: a.dataset.link});
+});
+
+/* 絵の中で人物が占める範囲（透明でないところ）を読み取り、頭から上半身が枠に入るように置く。
+   絵ごとに人物の大きさ・位置が違う（座った姿・杖を掲げた姿など）ため、決め打ちの切り取りでは合わない */
+const figureBox = new Map();
+function measureFigure(img) {
+  if (figureBox.has(img.src)) return figureBox.get(img.src);
+  const w = 120, h = Math.round(120 * img.naturalHeight / img.naturalWidth);
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  const cx = cv.getContext("2d"); cx.drawImage(img, 0, 0, w, h);
+  const a = cx.getImageData(0, 0, w, h).data;
+  let top = h, bottom = 0, left = w, right = 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (a[(y * w + x) * 4 + 3] > 40) {
+    if (y < top) top = y; if (y > bottom) bottom = y; if (x < left) left = x; if (x > right) right = x;
+  }
+  const box = top > bottom ? {top: 0, bottom: 1, cx: .5} : {top: top / h, bottom: (bottom + 1) / h, cx: (left + right + 1) / 2 / w};
+  figureBox.set(img.src, box);
+  return box;
+}
+function fitPic(img) {
+  const pic = img.parentElement, pw = pic.clientWidth, ph = pic.clientHeight;
+  if (!pw || !ph || !img.naturalWidth) return;
+  const b = measureFigure(img);
+  const whole = pic.classList.contains("whole");       // 全身を見せる（クエストの主人公）
+  const imgH = (whole ? ph * 0.86 : ph * 1.7) / (b.bottom - b.top);          // 人物の背丈を枠の1.7倍に（上の6割ほどが見える）
+  const imgW = imgH * img.naturalWidth / img.naturalHeight;
+  const topPx = whole ? (ph - (b.bottom - b.top) * imgH) / 2 - b.top * imgH : 8 - b.top * imgH;
+  Object.assign(img.style, {height: imgH + "px", top: topPx + "px", left: (pw / 2 - b.cx * imgW) + "px", transform: "none", bottom: "auto"});
+}
+addEventListener("resize", () => document.querySelectorAll("#cards .pic img").forEach(fitPic));
+
+/* ---------- Feedback ---------- */
+let fbRid = "";
+const newRid = () => hex(crypto.getRandomValues(new Uint8Array(12)));
+function renderFeedback() {
+  const fb = catalog.feedback;
+  $("#fb-en").textContent = fb.en; $("#fb-title").textContent = fb.ja;
+  $("#fb-name-label").textContent = fb.name_label;
+  $("#fb-target-label").textContent = fb.target_label;
+  $("#fb-body-label").textContent = fb.body_label;
+  $("#fb-send").textContent = fb.submit;
+  const sel = $("#fb-target");
+  if (!sel.options.length) {
+    const opt = t => `<option value="${esc(t)}">${esc(t)}</option>`;
+    sel.innerHTML = opt(fb.target_general) + catalog.categories.map(c =>
+      `<optgroup label="${esc(c.ja)}">` + catalog.games.filter(g => g.category === c.id)
+        .map(g => opt(c.ja + "：" + (g.title || g.ja))).join("") + "</optgroup>").join("") + opt(fb.target_other);
+  }
+  $("#fb-form").style.display = ""; $("#fb-done").style.display = "none";
+  $("#fb-msg").textContent = ""; $("#fb-msg").className = "";
+  if (!fbRid) fbRid = newRid();
+  $("#feedback .scroll").scrollTop = 0;
+}
+$("#fb-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const fb = catalog.feedback, msg = $("#fb-msg"), body = $("#fb-body").value;
+  if (!body.trim()) { msg.textContent = fb.empty; msg.className = "err"; $("#fb-body").focus(); return; }
+  $("#fb-send").disabled = true; msg.textContent = fb.sending; msg.className = "";
+  try {
+    // 文字列で送ると text/plain になり、事前の問い合わせ（プリフライト）なしで届く
+    const res = await fetch(fb.endpoint, {method: "POST", body: JSON.stringify({
+      name: $("#fb-name").value, target: $("#fb-target").value, body, website: $("#fb-website").value, rid: fbRid})});
+    const r = await res.json();
+    if (!r.ok) throw new Error(r.error || "failed");
+    $("#fb-name").value = ""; $("#fb-body").value = ""; $("#fb-target").selectedIndex = 0; fbRid = newRid();
+    $("#fb-thanks").textContent = fb.thanks;
+    ga("tlf_feedback_sent");
+    $("#fb-form").style.display = "none"; $("#fb-done").style.display = "block";
+  } catch (err) {
+    console.error(err);
+    msg.textContent = fb.error; msg.className = "err";   // 書いた中身は残す。受付番号も同じまま送り直す（二重に届かない）
+  } finally { $("#fb-send").disabled = false; }
+});
+
+/* ---------- Reading room ---------- */
+function closeGame() {
+  const f = $("#play iframe"); if (f) f.remove();
+  const m = $("#hall .mplayer"); if (m) m.remove();   // メディアの動画は、別の画面へ移ったら止める
+  stopAudio();
+  const a = $("#audioRoom"); if (a) a.remove();
+  if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+}
+async function openGame(g) {
+  // 続けて鳴っている音声（終わって次の定理へ進んだとき）は、止めずに部屋だけ描き直す
+  if (g.kind === "audio" && nowAudio === g.id) {
+    show("play");
+    $("#play-title").textContent = g.ja + (g.sub_ja ? "　" + g.sub_ja : "");
+    renderAudioRoom(g);
+    return;
+  }
+  closeGame();
+  show("play");
+  $("#loading").classList.add("on"); $("#bar").style.width = "0";
+  $("#loading-name").textContent = g.ja;
+  $("#play-title").textContent = g.ja + (g.sub_ja ? "　" + g.sub_ja : "");
+  try {
+    const file = (isPhone() && g.file_mobile) || g.file;
+    const buf = await fetchBin(file, r => $("#bar").style.width = (r * 92).toFixed(1) + "%");
+    const html = await decrypt(buf);
+    $("#bar").style.width = "100%";
+    if (location.hash !== "#/play/" + g.id) return;   // left while loading
+    if (g.kind === "audio") { playTrack(g, audioUrl(html)); renderAudioRoom(g); return; }
+    blobUrl = URL.createObjectURL(new Blob([html], {type: "text/html;charset=utf-8"}));
+    const f = document.createElement("iframe");
+    f.src = blobUrl + (g.open_hash ? "#" + g.open_hash : ""); f.setAttribute("aria-label", g.ja); f.allow = "fullscreen; autoplay"; f.allowFullscreen = true;
+    $("#play").appendChild(f);
+    f.addEventListener("load", () => $("#loading").classList.remove("on"), {once: true});
+  } catch (err) {
+    console.error(err);
+    $("#loading-name").textContent = "開けませんでした。通信を確かめて、もう一度お試しください。";
+  }
+}
+
+/* ---------- Listening room（要点音声） ----------
+   スマホで画面を消したまま次の定理へ続けて流れるよう、
+   - 音声の要素は1つだけ作って使い回す（新しく作った要素の自動再生は、画面オフや操作の無いときには止められる）
+   - 次の定理は、いまの定理を流している間に取り寄せて解いておき、終わった瞬間に差し替えて鳴らす
+   - 鍵の画面・通知の「次へ」「前へ」からも進める */
+const player = new Audio();
+player.controls = true; player.preload = "auto";
+let nowAudio = null, nowUrl = null, nextAudio = null, playCounted = false;
+
+/* 再生のしかた（音声の一覧で選ぶ。既定は連続再生）。選んだものはこの端末に覚えておく */
+const PLAY_MODES = [["next", "連続再生"], ["all", "全ループ再生"], ["one", "1定理繰り返し再生"], ["stop", "1定理で停止"]];
+const MODE_STORE = "tlf-play-mode";
+let playMode = "next";
+try { const m = localStorage.getItem(MODE_STORE); if (PLAY_MODES.some(x => x[0] === m)) playMode = m; } catch (_) {}
+function renderPlayMode(c) {
+  const box = $("#hall-mode");
+  const isAudio = catalog.games.some(g => g.category === c.id && g.kind === "audio");
+  box.style.display = isAudio ? "" : "none";
+  if (!isAudio) return;
+  box.innerHTML = PLAY_MODES.map(([k, label]) => `<button type="button" data-mode="${k}" aria-pressed="${k === playMode}">${label}</button>`).join("");
+}
+$("#hall-mode").addEventListener("click", e => {
+  const b = e.target.closest("[data-mode]"); if (!b) return;
+  playMode = b.dataset.mode;
+  try { localStorage.setItem(MODE_STORE, playMode); } catch (_) {}
+  $("#hall-mode").querySelectorAll("[data-mode]").forEach(x => x.setAttribute("aria-pressed", x.dataset.mode === playMode));
+  const g = audioById(nowAudio); if (g) prefetchNext(g);
+});
+/* 終わったときに次に鳴らす定理（同じ定理をくり返すとき・止めるときは無し） */
+function upcoming(g) {
+  if (playMode === "next") return audioNeighbors(g).next;
+  if (playMode === "all") return audioNeighbors(g).next || catalog.games.find(x => x.category === g.category);
+  return null;
+}
+const audioUrl = data => URL.createObjectURL(new Blob([data], {type: "audio/mp4"}));
+const audioById = id => catalog && catalog.games.find(x => x.id === id && x.kind === "audio");
+function audioNeighbors(g) {
+  const list = catalog.games.filter(x => x.category === g.category), i = list.findIndex(x => x.id === g.id);
+  return {prev: list[i - 1], next: list[i + 1]};
+}
+const audioLabel = g => g.title + "　" + g.detail;
+
+/* 押された瞬間に、無音を一度鳴らしておく。取り寄せの後で鳴らすときに「操作の無い自動再生」として止められないため */
+const SILENT = (() => {
+  const n = 800, b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+  const s = (o, t) => [...t].forEach((c, k) => v.setUint8(o + k, c.charCodeAt(0)));
+  s(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); s(8, "WAVE"); s(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 16000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  s(36, "data"); v.setUint32(40, n * 2, true);
+  return URL.createObjectURL(new Blob([b], {type: "audio/wav"}));
+})();
+function unlockPlayer() {
+  if (!player.paused) return;
+  player.src = SILENT;
+  player.play().catch(() => {});
+}
+
+function stopAudio() {
+  player.pause(); player.removeAttribute("src");
+  if (nowUrl) URL.revokeObjectURL(nowUrl);
+  if (nextAudio && nextAudio.url) URL.revokeObjectURL(nextAudio.url);
+  nowAudio = nowUrl = nextAudio = null;
+}
+function playTrack(g, url) {
+  const old = nowUrl;
+  nowAudio = g.id; nowUrl = url; playCounted = false;
+  player.src = url;
+  player.play().catch(() => {});   // 止められたときは、画面の再生ボタンで始めてもらう
+  if (old && old !== url) URL.revokeObjectURL(old);
+  if ("mediaSession" in navigator) { try { navigator.mediaSession.metadata = new MediaMetadata({title: g.title + " " + g.detail, artist: "Theorem Learning Field"}); } catch (_) {} }
+  prefetchNext(g);
+}
+function prefetchNext(g) {
+  let next = upcoming(g);
+  if (next && next.id === g.id) next = null;   // 定理が1本だけのときの全ループ再生は、くり返しと同じ
+  if (nextAudio && next && nextAudio.id === next.id) return;
+  if (nextAudio && nextAudio.url) URL.revokeObjectURL(nextAudio.url);
+  if (!next) { nextAudio = null; return; }
+  const slot = {id: next.id, url: null};
+  nextAudio = slot;
+  slot.ready = fetchBin(next.file).then(decrypt).then(d => {
+    if (nextAudio !== slot) return null;
+    return slot.url = audioUrl(d);
+  }).catch(() => null);
+}
+/* 鳴らしたまま別の定理へ移る（終わったとき・鍵の画面の「次へ」「前へ」） */
+async function advanceTo(target) {
+  const from = nowAudio;
+  let url = null;
+  if (nextAudio && nextAudio.id === target.id) {
+    url = nextAudio.url || await nextAudio.ready;   // 用意が済んでいれば待たずに差し替える
+    if (url) nextAudio = null;
+  }
+  if (!url) {
+    try { url = audioUrl(await decrypt(await fetchBin(target.file))); } catch (err) { console.error(err); return; }
+  }
+  if (nowAudio !== from) { URL.revokeObjectURL(url); return; }   // 待つ間に部屋を出た・別の定理を選んだ
+  playTrack(target, url);
+  location.hash = "#/play/" + target.id;   // 画面は openGame が、鳴っている音声に合わせて描き直す
+}
+player.addEventListener("playing", () => {
+  const g = player.src === nowUrl && audioById(nowAudio);
+  if (g && !playCounted) { playCounted = true; ga("tlf_audio_play", {content_id: g.id, content_title: audioLabel(g)}); }
+});
+player.addEventListener("ended", () => {
+  const g = player.src === nowUrl && audioById(nowAudio);   // 無音を鳴らし終えたときは何もしない
+  if (!g) return;
+  ga("tlf_audio_complete", {content_id: g.id, content_title: audioLabel(g)});
+  const next = upcoming(g);
+  if (playMode === "one" || (next && next.id === g.id)) { player.currentTime = 0; player.play().catch(() => {}); return; }
+  if (next) advanceTo(next);   // 終わったら次の定理へ（全ループ再生では、最後の次は最初の定理）
+});
+if ("mediaSession" in navigator) {
+  for (const [action, side] of [["nexttrack", "next"], ["previoustrack", "prev"]]) {
+    try {
+      navigator.mediaSession.setActionHandler(action, () => {
+        const g = audioById(nowAudio), t = g && audioNeighbors(g)[side];
+        if (t) advanceTo(t);
+      });
+    } catch (_) {}
+  }
+}
+function renderAudioRoom(g) {
+  const {prev, next} = audioNeighbors(g);
+  const credit = (catalog.categories.find(c => c.id === g.category) || {}).credit;
+  const old = $("#audioRoom");
+  const room = document.createElement("div");
+  room.id = "audioRoom";
+  room.innerHTML = `<div class="ar-bg"></div><div class="ar-card">
+      <img class="ar-sage" src="${g.card}" alt="">
+      <div class="ar-num">${esc(g.title)}</div>
+      <h2>${esc(g.detail)}</h2>
+      <div class="ar-player"></div>
+      <div class="ar-nav">
+        ${prev ? `<button class="back sub" data-go="#/play/${esc(prev.id)}">← ${esc(prev.title)}</button>` : "<span></span>"}
+        ${next ? `<button class="back sub" data-go="#/play/${esc(next.id)}">${esc(next.title)} →</button>` : "<span></span>"}
+      </div>
+      ${credit ? `<p class="credit">${esc(credit)}</p>` : ""}</div>`;
+  $("#play").appendChild(room);
+  room.querySelector(".ar-player").replaceWith(player);   // 前の部屋から移すだけ（鳴ったまま）
+  if (old) old.remove();
+  room.querySelector(".ar-bg").style.backgroundImage = `url(${catalog.bg_library})`;
+  $("#loading").classList.remove("on");
+}
+
+/* ---------- Analytics ----------
+   送るのは画面の名前（教材の題）と、入口を通った・音声を聞いた、の別だけ。
+   パスワード・ご意見の中身・お名前は送らない */
+const ga = (name, params) => { try { if (typeof gtag === "function") gtag("event", name, params || {}); } catch (_) {} };
+function track(path, title) {
+  ga("page_view", {page_location: location.origin + "/" + path, page_path: "/" + path, page_title: title});
+}
+let lastTracked = null;
+function trackRoute(path, title) {
+  if (path === lastTracked) return;   // 同じ画面の描き直しでは数えない
+  lastTracked = path; track(path, title);
+}
+
+/* ---------- Routing ---------- */
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+}
+function route() {
+  if (!catalog) { show("gate"); trackRoute("gate", "入口"); return; }
+  const h = location.hash.replace(/^#\/?/, "");
+  if (h.startsWith("play/")) {
+    const g = catalog.games.find(x => x.id === h.slice(5));
+    if (g) {
+      const c = catalog.categories.find(x => x.id === g.category);
+      trackRoute("play/" + g.id, (c ? c.ja + "：" : "") + (g.title || g.ja) + (g.detail ? "　" + g.detail : ""));
+      openGame(g); return;
+    }
+  }
+  closeGame();
+  if (h.startsWith("media/")) {
+    const s = (catalog.media || []).find(x => x.id === h.slice(6));
+    if (s) { renderSeries(s); show("hall"); trackRoute("media/" + s.id, "メディア：" + s.title); return; }
+  }
+  if (h === "feedback" && catalog.feedback && catalog.feedback.endpoint) { renderFeedback(); show("feedback"); trackRoute("feedback", "ご意見・ご感想"); return; }
+  const c = catalog.categories.find(x => x.id === h);
+  if (c) { renderHall(c); show("hall"); trackRoute(c.id, c.ja); } else { show("field"); trackRoute("", "トップ"); }
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-go]"); if (!t) return;
+  const go = t.dataset.go;
+  if (go.startsWith("#/play/") && audioById(go.slice(7))) unlockPlayer();   // 音声へ進む押し下げのうちに、鳴らす許しを得ておく
+  if (go === "back") {
+    const g = catalog && catalog.games.find(x => "#/play/" + x.id === location.hash);
+    location.hash = g ? "#/" + g.category : "#/";
+  } else location.hash = go;
+});
+addEventListener("hashchange", route);
+
+/* ---------- Start ---------- */
+(async () => {
+  if (SHARED_ORIGIN) { $("#remember-label").style.display = "none"; $("#remember-note").style.display = "none"; }
+  let saved = null;
+  try { saved = SHARED_ORIGIN ? null : localStorage.getItem(KEY_STORE); } catch (_) {}
+  if (saved) {
+    try { aesKey = await importAes(unhex(saved)); await openCatalog(); ga("tlf_unlock", {method: "saved"}); }
+    catch (err) {
+      aesKey = null; catalog = null;
+      // 鍵が合わない（パスワードが変わった）ときだけ忘れる。通信の失敗では忘れない
+      if (!(err instanceof TypeError) && !/^HTTP /.test(err.message)) { try { localStorage.removeItem(KEY_STORE); } catch (__) {} }
+      else { $("#err").textContent = "The archive could not be reached."; }
+    }
+  }
+  route();
+  if (!catalog) $("#pw").focus();
+})();
+</script>
+</body>
+</html>

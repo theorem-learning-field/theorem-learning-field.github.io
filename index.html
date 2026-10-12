@@ -830,11 +830,26 @@ function prefetchNext(g) {
   if (!next) { nextAudio = null; return; }
   const slot = {id: next.id, url: null};
   nextAudio = slot;
-  slot.ready = fetchBin(next.file).then(decrypt).then(d => {
+  slot.ready = fetchRetry(next.file).then(d => {
     if (nextAudio !== slot) return null;
     return slot.url = audioUrl(d);
-  }).catch(() => null);
+  }).catch(() => {
+    if (nextAudio === slot) nextAudio = null;   // 失敗したら空けておき、終わり近くでもう一度取りに行く
+    return null;
+  });
 }
+/* 画面を消しているあいだは通信が途切れやすいので、取り寄せは間をおいて3回まで試す */
+async function fetchRetry(file) {
+  for (let i = 0; ; i++) {
+    try { return await decrypt(await fetchBin(file)); }
+    catch (err) { if (i >= 2) throw err; await new Promise(r => setTimeout(r, 3000 * (i + 1))); }
+  }
+}
+// 終わりの1分前になっても次の定理の用意が無ければ、もう一度取りに行く
+player.addEventListener("timeupdate", () => {
+  const g = player.src === nowUrl && audioById(nowAudio);
+  if (g && !nextAudio && player.duration - player.currentTime < 60) prefetchNext(g);
+});
 /* 鳴らしたまま別の定理へ移る（終わったとき・鍵の画面の「次へ」「前へ」） */
 async function advanceTo(target) {
   const from = nowAudio;
@@ -844,7 +859,7 @@ async function advanceTo(target) {
     if (url) nextAudio = null;
   }
   if (!url) {
-    try { url = audioUrl(await decrypt(await fetchBin(target.file))); } catch (err) { console.error(err); return; }
+    try { url = audioUrl(await fetchRetry(target.file)); } catch (err) { console.error(err); return; }
   }
   if (nowAudio !== from) { URL.revokeObjectURL(url); return; }   // 待つ間に部屋を出た・別の定理を選んだ
   playTrack(target, url);
@@ -875,23 +890,27 @@ if ("mediaSession" in navigator) {
 function renderAudioRoom(g) {
   const {prev, next} = audioNeighbors(g);
   const credit = (catalog.categories.find(c => c.id === g.category) || {}).credit;
-  const old = $("#audioRoom");
-  const room = document.createElement("div");
-  room.id = "audioRoom";
-  room.innerHTML = `<div class="ar-bg"></div><div class="ar-card">
-      <img class="ar-sage" src="${g.card}" alt="">
-      <div class="ar-num">${esc(g.title)}</div>
-      <h2>${esc(g.detail)}</h2>
-      <div class="ar-player"></div>
-      <div class="ar-nav">
-        ${prev ? `<button class="back sub" data-go="#/play/${esc(prev.id)}">← ${esc(prev.title)}</button>` : "<span></span>"}
-        ${next ? `<button class="back sub" data-go="#/play/${esc(next.id)}">${esc(next.title)} →</button>` : "<span></span>"}
-      </div>
-      ${credit ? `<p class="credit">${esc(credit)}</p>` : ""}</div>`;
-  $("#play").appendChild(room);
-  room.querySelector(".ar-player").replaceWith(player);   // 前の部屋から移すだけ（鳴ったまま）
-  if (old) old.remove();
-  room.querySelector(".ar-bg").style.backgroundImage = `url(${catalog.bg_library})`;
+  let room = $("#audioRoom");
+  if (!room) {
+    room = document.createElement("div");
+    room.id = "audioRoom";
+    room.innerHTML = `<div class="ar-bg"></div><div class="ar-card">
+      <img class="ar-sage" alt=""><div class="ar-num"></div><h2></h2>
+      <div class="ar-player"></div><div class="ar-nav"></div><p class="credit"></p></div>`;
+    $("#play").appendChild(room);
+    room.querySelector(".ar-player").replaceWith(player);
+    room.querySelector(".ar-bg").style.backgroundImage = `url(${catalog.bg_library})`;
+  }
+  // 次の定理へ進んだときは、部屋を作り直さずに中身の文字と絵だけ替える。
+  // 鳴っている音声の要素は動かさない（スマホで画面を消しているとき、要素を動かすと止まることがあるため）
+  room.querySelector(".ar-sage").src = g.card;
+  room.querySelector(".ar-num").textContent = g.title;
+  room.querySelector("h2").textContent = g.detail;
+  room.querySelector(".ar-nav").innerHTML =
+    (prev ? `<button class="back sub" data-go="#/play/${esc(prev.id)}">← ${esc(prev.title)}</button>` : "<span></span>") +
+    (next ? `<button class="back sub" data-go="#/play/${esc(next.id)}">${esc(next.title)} →</button>` : "<span></span>");
+  const cr = room.querySelector(".credit");
+  cr.textContent = credit || ""; cr.style.display = credit ? "" : "none";
   $("#loading").classList.remove("on");
 }
 

@@ -132,6 +132,47 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .lrow .meta{align-self:center;text-align:right;white-space:nowrap;font:600 15px/1.9 var(--mincho);color:var(--muted)}
 .lrow .meta .pub{font-size:16px;color:var(--gold-hi)}
 
+/* ---------- 封印（鎖のバッテンと錠前）：扉 IX「定理の動的図解」と、開かない行（2026-10-16 社長ご指示） ---------- */
+:root{--chain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='22' viewBox='0 0 52 22'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fbe9b8'/%3E%3Cstop offset='.45' stop-color='%23d8b26a'/%3E%3Cstop offset='1' stop-color='%237a5a22'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='url%28%23g%29' stroke='%231c1406' stroke-width='1.4'%3E%3Crect x='21' y='8.6' width='38' height='4.8' rx='2.4'/%3E%3Crect x='-31' y='8.6' width='38' height='4.8' rx='2.4'/%3E%3C/g%3E%3Crect x='2.5' y='3' width='26' height='16' rx='8' fill='none' stroke='%231c1406' stroke-width='6.2'/%3E%3Crect x='2.5' y='3' width='26' height='16' rx='8' fill='none' stroke='url%28%23g%29' stroke-width='3.8'/%3E%3Cpath d='M8 5.4h14' stroke='%23fff6dc' stroke-opacity='.75' stroke-width='1.1' stroke-linecap='round'/%3E%3C/svg%3E")}
+.chains{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.chains i{position:absolute;left:50%;top:50%;width:260%;height:22px;margin:-11px 0 0 -130%;background:var(--chain) repeat-x center/52px 22px;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.7));transform:rotate(var(--a,45deg))}
+.chains i + i{transform:rotate(calc(-1 * var(--a,45deg)))}
+.padlock{display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,.75))}
+.door.sealed{overflow:hidden}
+.door.sealed > *:not(.lockbox){position:relative;z-index:2}
+.door.sealed .num,.door.sealed h3,.door.sealed p.jname,.door.sealed .sub,.door.sealed .count{display:table;margin-left:auto;margin-right:auto;padding:4px 12px;border-radius:4px;background:rgba(10,13,23,.82)}
+.door.sealed .num{padding:5px 8px 5px 12px}
+.door.sealed h3{margin-top:10px;margin-bottom:0}
+.door .sub{margin-top:8px;font:600 12px/1.5 var(--serif-h);letter-spacing:.16em;color:var(--gold)}
+.door.sealed .count{margin-top:12px;border-top:0;padding-top:6px}
+.lockbox{position:relative;height:96px;margin:6px 0}
+.lockbox .chains{--a:52deg;overflow:visible}
+.lockbox .chains i{width:900px;margin-left:-450px}
+.lockbox .padlock{position:relative;z-index:3;width:64px;height:84px;margin:6px auto 0}
+.door.sealed:hover .padlock{animation:lockjolt .5s ease}
+@keyframes lockjolt{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}60%{transform:rotate(5deg)}}
+.lrow.sealed{cursor:not-allowed;background:linear-gradient(90deg,rgba(24,24,36,.94),rgba(12,13,24,.95) 40%,rgba(8,9,16,.95))}
+.lrow.sealed:hover{transform:none;box-shadow:inset 0 0 0 3px rgba(10,13,23,.5),inset 0 0 0 4px rgba(216,178,106,.22),0 12px 28px rgba(0,0,0,.45)}
+.lrow.sealed .txt,.lrow.sealed .meta{position:relative;z-index:2;opacity:.8}
+.lrow.sealed h4,.lrow.sealed .detail{text-shadow:0 0 6px #0a0d17,0 0 12px #0a0d17,0 2px 4px #000}
+.lrow.sealed > .chains{opacity:.75}
+.lrow.sealed > .chains{left:150px;--a:14deg}
+.lrow.sealed .pic{background:radial-gradient(ellipse at 50% 45%,rgba(120,96,50,.35),rgba(10,13,23,.9) 70%)}
+.lrow.sealed .pic .chains{--a:45deg}
+.lrow.sealed .pic .padlock{position:absolute;z-index:2;left:50%;top:50%;width:46px;height:60px;margin:-30px 0 0 -23px}
+.lrow .meta .sealmark{display:inline-block;padding:2px 10px;border:1px solid var(--gold-lo);border-radius:12px;font:700 13px/1.5 var(--mincho);letter-spacing:.12em;color:var(--gold)}
+.lrow.rattle{animation:rattle .42s ease}
+@keyframes rattle{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.lrow .pic.cover img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;transform:none;filter:none}
+.lrow:hover .pic.cover img{filter:brightness(1.06)}
+.hall-head .sub{display:table;margin:-2px auto 12px;padding:3px 14px;border-radius:14px;background:rgba(10,13,23,.6);font:600 clamp(12px,1.3vw,14px)/1.4 var(--serif-h);letter-spacing:.2em;color:var(--gold-hi);text-shadow:0 2px 8px rgba(0,0,0,.9)}
+@media (max-width:760px){
+  .lrow.sealed > .chains{left:92px;--a:20deg}
+  .lockbox{height:84px}
+  .lockbox .padlock{width:54px;height:72px}
+}
+
 /* ---------- Feedback ---------- */
 .fb-entry-row{text-align:center;margin-top:clamp(22px,4vh,40px)}
 #fb-entry{display:inline-flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;min-width:min(440px,100%);padding:16px 26px 15px;border:1px solid rgba(216,178,106,.55);border-radius:6px;
@@ -348,6 +389,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
       <div class="num" id="hall-num"></div>
       <div class="en" id="hall-en"></div>
       <h1 id="hall-title"></h1>
+      <div class="sub" id="hall-sub"></div>
       <p id="hall-desc"></p>
       <p id="hall-note"></p>
       <div id="hall-mode" role="group" aria-label="再生のしかた"></div>
@@ -474,14 +516,32 @@ $("#seal-btn").addEventListener("click", () => {
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
 const word = n => ["Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve"][n] || ({20:"Twenty",30:"Thirty",40:"Forty"}[n]) || n;
 const mmss = sec => Math.floor(sec / 60) + "分" + String(sec % 60).padStart(2, "0") + "秒";
+/* 封印の絵（2026-10-16 社長ご指示）：鎖を二本X字に掛け、真ん中に錠前。
+   錠前の色の id は絵ごとに替える（隠れた画面の中の定義を他の絵が参照すると、色が付かないため） */
+let lockN = 0;
+function padlock() {
+  const id = "plg" + (++lockN);
+  return `<svg class="padlock" viewBox="0 0 64 84" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe9b8"/><stop offset=".5" stop-color="#d8b26a"/><stop offset="1" stop-color="#7a5a22"/></linearGradient></defs>
+    <path d="M17 38V24a15 15 0 0 1 30 0v14" fill="none" stroke="#1c1406" stroke-width="11"/><path d="M17 38V24a15 15 0 0 1 30 0v14" fill="none" stroke="url(#${id})" stroke-width="7"/>
+    <rect x="6" y="34" width="52" height="44" rx="7" fill="url(#${id})" stroke="#1c1406" stroke-width="2.5"/><rect x="11" y="39" width="42" height="34" rx="4" fill="none" stroke="#7a5a22" stroke-width="1.2" opacity=".7"/>
+    <circle cx="32" cy="52" r="5.5" fill="#1c1406"/><path d="M29.5 55h5l1.5 11h-8z" fill="#1c1406"/></svg>`;
+}
+const CHAINS = `<span class="chains" aria-hidden="true"><i></i><i></i></span>`;
 function renderDoors() {
   $("#doors").innerHTML = catalog.categories.map(c => {
     const n = c.kind === "books" ? (catalog.books || []).length : c.kind === "media" ? (catalog.media || []).length : c.kind === "links" ? (c.sections || []).reduce((a, x) => a + x.items.length, 0) : catalog.games.filter(g => g.category === c.id).length;
-    const unit = c.kind === "books" ? (n === 1 ? "Book" : "Books") : c.kind === "media" ? "Series" : c.kind === "links" ? (n === 1 ? "Link" : "Links") : c.id === "quests" ? (n === 1 ? "Quest" : "Quests") : c.id === "audio" ? (n === 1 ? "Recording" : "Recordings") : (n === 1 ? "Lecture" : "Lectures");
+    const unit = c.unit_en ? c.unit_en[n === 1 ? 0 : 1] : c.kind === "books" ? (n === 1 ? "Book" : "Books") : c.kind === "media" ? "Series" : c.kind === "links" ? (n === 1 ? "Link" : "Links") : c.id === "quests" ? (n === 1 ? "Quest" : "Quests") : c.id === "audio" ? (n === 1 ? "Recording" : "Recordings") : (n === 1 ? "Lecture" : "Lectures");
+    const sub = c.subtitle ? `<p class="sub">${esc(c.subtitle)}</p>` : "";
+    if (c.seal) return `<button class="door sealed" data-go="#/${esc(c.id)}">
+      <div class="num">${esc(c.numeral)}</div>
+      <h3>${esc(c.en)}</h3>
+      <div class="lockbox">${CHAINS}${padlock()}</div>
+      <p class="jname">${esc(c.ja)}</p>${sub}
+      <span class="count">${word(n)} ${unit}</span></button>`;
     return `<button class="door" data-go="#/${esc(c.id)}">
       <div class="ornament">✦</div><div class="num">${esc(c.numeral)}</div>
       <h3>${esc(c.en)}</h3>
-      <p class="jname">${esc(c.ja)}</p>
+      <p class="jname">${esc(c.ja)}</p>${sub}
       <span class="count">${word(n)} ${unit}</span></button>`;
   }).join("");
 }
@@ -490,6 +550,8 @@ function renderHall(c) {
   $("#hall-num").textContent = c.numeral;
   $("#hall-en").textContent = c.en;
   $("#hall-title").textContent = c.ja;
+  $("#hall-sub").textContent = c.subtitle || "";
+  $("#hall-sub").style.display = c.subtitle ? "" : "none";
   $("#hall-desc").textContent = c.desc_ja;
   $("#hall-note").textContent = c.note_ja || "";
   $("#hall-note").style.display = c.note_ja ? "" : "none";
@@ -505,10 +567,15 @@ function renderHall(c) {
     .map((g, i) => [g, i]).sort((a, b) => (a[0].pub || "9") < (b[0].pub || "9") ? -1 : (a[0].pub || "9") > (b[0].pub || "9") ? 1 : a[1] - b[1])
     .map(x => x[0]);
   const row = g => {
+    // 封印の行：名前だけを出し、押しても開かない（行き先を持たない。中身は暗号文にもしていない）
+    if (g.locked) return `<div class="lrow sealed" aria-disabled="true" title="封印されています">
+      <div class="pic">${CHAINS}${padlock()}</div>
+      <div class="txt"><h4>${esc(g.title || g.ja)}</h4><p class="detail">${esc(g.detail || g.sub_ja)}</p></div>
+      <div class="meta"><span class="sealmark">封印</span></div>${CHAINS}</div>`;
     const pub = g.pub ? `<span class="pub">${esc(g.pub.replace(/-/g, "/"))} 公開</span><br>` : "";
     const les = g.duration ? `<span class="les">${mmss(g.duration)}</span>` : g.lessons ? `<span class="les">${g.lessons}${esc(g.unit || "コマ")}</span>` : "";
     return `<button class="lrow" data-go="#/play/${esc(g.id)}">
-      <div class="pic${g.pic_fit === "whole" ? " whole" : ""}"><img src="${g.card}" alt=""></div>
+      <div class="pic${g.pic_fit === "whole" ? " whole" : g.pic_fit === "cover" ? " cover" : ""}"><img src="${g.card}" alt=""></div>
       <div class="txt"><h4>${esc(g.title || g.ja)}</h4><p class="detail">${esc(g.detail || g.sub_ja)}</p></div>
       <div class="meta">${pub}${les}</div></button>`;
   };
@@ -657,6 +724,7 @@ function measureFigure(img) {
 }
 function fitPic(img) {
   const pic = img.parentElement, pw = pic.clientWidth, ph = pic.clientHeight;
+  if (pic.classList.contains("cover")) return;   // 図解の縮小画面は枠いっぱいに敷く（CSS の object-fit）
   if (!pw || !ph || !img.naturalWidth) return;
   const b = measureFigure(img);
   const whole = pic.classList.contains("whole");       // 全身を見せる（クエストの主人公）
@@ -682,7 +750,7 @@ function renderFeedback() {
     const opt = t => `<option value="${esc(t)}">${esc(t)}</option>`;
     sel.innerHTML = opt(fb.target_general) + catalog.categories.map(c =>
       `<optgroup label="${esc(c.ja)}">` + catalog.games.filter(g => g.category === c.id)
-        .map(g => opt(c.ja + "：" + (g.title || g.ja))).join("") + "</optgroup>").join("") + opt(fb.target_other);
+        .filter(g => !g.locked).map(g => opt(c.ja + "：" + (g.title || g.ja) + (c.kind === "diagrams" && g.detail ? "　" + g.detail : ""))).join("") + "</optgroup>").join("") + opt(fb.target_other);
   }
   $("#fb-form").style.display = ""; $("#fb-done").style.display = "none";
   $("#fb-msg").textContent = ""; $("#fb-msg").className = "";
@@ -936,6 +1004,7 @@ function route() {
   const h = location.hash.replace(/^#\/?/, "");
   if (h.startsWith("play/")) {
     const g = catalog.games.find(x => x.id === h.slice(5));
+    if (g && g.locked) { location.replace("#/" + g.category); return; }   // 封印の行は開かない（直に打ち込まれても）
     if (g) {
       const c = catalog.categories.find(x => x.id === g.category);
       trackRoute("play/" + g.id, (c ? c.ja + "：" : "") + (g.title || g.ja) + (g.detail ? "　" + g.detail : ""));
@@ -952,6 +1021,8 @@ function route() {
   if (c) { renderHall(c); show("hall"); trackRoute(c.id, c.ja); } else { show("field"); trackRoute("", "トップ"); }
 }
 document.addEventListener("click", e => {
+  const sealed = e.target.closest(".lrow.sealed");
+  if (sealed) { sealed.classList.remove("rattle"); void sealed.offsetWidth; sealed.classList.add("rattle"); return; }   // 揺れるだけで開かない
   const t = e.target.closest("[data-go]"); if (!t) return;
   const go = t.dataset.go;
   if (go.startsWith("#/play/") && audioById(go.slice(7))) unlockPlayer();   // 音声へ進む押し下げのうちに、鳴らす許しを得ておく

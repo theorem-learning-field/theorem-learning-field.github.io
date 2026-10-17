@@ -186,7 +186,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
   background:linear-gradient(180deg,rgba(27,38,72,.92),rgba(10,13,23,.95));box-shadow:inset 0 0 0 4px rgba(10,13,23,.55),inset 0 0 0 5px rgba(216,178,106,.28),0 20px 40px rgba(0,0,0,.5)}
 .fb-card label.f{display:block;margin:0 0 18px;font:700 clamp(15px,1.6vw,17px)/1.6 var(--mincho);color:var(--parch)}
 .fb-card label.f span{display:block;margin-bottom:8px}
-.fb-card input[type=text],.fb-card select,.fb-card textarea{display:block;width:100%;padding:10px 12px;border-radius:4px;border:1px solid var(--gold-lo);
+.fb-card input[type=text],.fb-card input[type=email],.fb-card select,.fb-card textarea{display:block;width:100%;padding:10px 12px;border-radius:4px;border:1px solid var(--gold-lo);
   background:rgba(239,228,200,.07);color:var(--parch);font:500 16px/1.6 var(--mincho);outline:none}
 .fb-card select option,.fb-card select optgroup{background:#121a33;color:var(--parch)}
 .fb-card textarea{min-height:220px;resize:vertical}
@@ -204,6 +204,14 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .empty-notice .en{display:block;font:700 clamp(16px,1.8vw,19px)/1.3 var(--serif-h);letter-spacing:.12em;color:var(--gold-hi)}
 .empty-notice .ja{display:block;margin-top:10px;font:600 15px/1.8 var(--mincho);color:var(--parch)}
 #fb-entry[hidden]{display:none}
+.fb-card .fnote{display:block;margin-top:6px;font:500 13px/1.6 var(--mincho);color:var(--muted)}
+.fb-card label.f[hidden]{display:none}
+.lvtitle{margin:clamp(18px,4vh,36px) auto 0;width:min(760px,100%);padding:clamp(18px,3vw,28px) clamp(18px,3vw,34px);text-align:center;border:1px solid rgba(216,178,106,.6);border-radius:6px;background:linear-gradient(180deg,rgba(10,13,23,.88),rgba(18,24,44,.88));box-shadow:inset 0 0 0 4px rgba(10,13,23,.55),inset 0 0 0 5px rgba(216,178,106,.35),0 16px 36px rgba(0,0,0,.5)}
+.lvtitle[hidden]{display:none}
+.lvtitle .en{font:700 clamp(22px,3.4vw,36px)/1.15 var(--serif-h);letter-spacing:.14em;color:var(--gold-hi);text-shadow:0 0 18px rgba(216,178,106,.35)}
+.lvtitle .en:before,.lvtitle .en:after{content:"✦";margin:0 .5em;font-size:.45em;vertical-align:middle;color:var(--gold)}
+.lvtitle h1{margin:10px 0 0;font:800 clamp(19px,2.6vw,26px)/1.4 var(--mincho);letter-spacing:.3em;color:var(--parch)}
+.lvtitle .sub{margin:10px 0 0;font:500 clamp(13px,1.5vw,15px)/1.7 var(--mincho);color:rgba(236,224,196,.82)}
 footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;font-style:italic;color:rgba(195,180,143,.8)}
 
 @media (max-width:760px){
@@ -375,6 +383,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
   <div class="scroll">
     <div class="hero"><img id="hero-img" alt="Theorem Learning Field"></div>
     <div class="wrap field-wrap">
+    <div class="lvtitle" id="lv-title" hidden><div class="en"></div><h1></h1><p class="sub"></p></div>
     <div class="doors" id="doors"></div>
     <p class="empty-notice" id="empty-notice" hidden><span class="en"></span><span class="ja"></span></p>
     <div class="fb-entry-row"><button id="fb-entry" data-go="#/feedback" hidden><span class="en"></span><span class="ja"></span></button></div>
@@ -415,6 +424,7 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
     <div class="fb-card">
       <form id="fb-form" autocomplete="off" novalidate>
         <label class="f"><span id="fb-name-label"></span><input type="text" id="fb-name" maxlength="100"></label>
+        <label class="f" id="fb-email-row" hidden><span id="fb-email-label"></span><input type="email" id="fb-email" maxlength="200" autocomplete="email"><small class="fnote" id="fb-email-note"></small></label>
         <label class="f"><span id="fb-target-label"></span><select id="fb-target"></select></label>
         <label class="f"><span id="fb-body-label"></span><textarea id="fb-body" maxlength="10000"></textarea></label>
         <div class="hp" aria-hidden="true"><input type="text" id="fb-website" tabindex="-1" autocomplete="off"></div>
@@ -488,6 +498,10 @@ async function openCatalog() {
   $("#bg-library-fb").style.backgroundImage = `url(${catalog.bg_library})`;
   $("#footer-note").textContent = catalog.footer_en || "";
   $("#empty-notice").hidden = catalog.categories.length > 0;
+  const tt = catalog.title || {};
+  $("#lv-title").hidden = !tt.en && !tt.ja;
+  $("#lv-title .en").textContent = tt.en || ""; $("#lv-title h1").textContent = tt.ja || ""; $("#lv-title .sub").textContent = tt.sub || "";
+  $("#fb-target").innerHTML = "";   // 段が替わったら選択肢を作り直す
   $("#empty-notice .en").textContent = catalog.empty_notice_en || "";
   $("#empty-notice .ja").textContent = catalog.empty_notice_ja || "";
   renderDoors();
@@ -756,12 +770,15 @@ function renderFeedback() {
   $("#fb-en").textContent = fb.en; $("#fb-title").textContent = fb.ja;
   $("#fb-name-label").textContent = fb.name_label;
   $("#fb-target-label").textContent = fb.target_label;
+  $("#fb-email-row").hidden = !fb.email_label;
+  $("#fb-email-label").textContent = fb.email_label || ""; $("#fb-email-note").textContent = fb.email_note || "";
   $("#fb-body-label").textContent = fb.body_label;
   $("#fb-send").textContent = fb.submit;
   const sel = $("#fb-target");
   if (!sel.options.length) {
     const opt = t => `<option value="${esc(t)}">${esc(t)}</option>`;
-    sel.innerHTML = opt(fb.target_general) + catalog.categories.map(c =>
+    if (fb.target_options) sel.innerHTML = fb.target_options.map(opt).join("");   // 段ごとの決まった選択肢（お問い合わせの種類など）
+    else sel.innerHTML = opt(fb.target_general) + catalog.categories.map(c =>
       `<optgroup label="${esc(c.ja)}">` + catalog.games.filter(g => g.category === c.id)
         .filter(g => !g.locked).map(g => opt(c.ja + "：" + (g.title || g.ja) + (c.kind === "diagrams" && g.detail ? "　" + g.detail : ""))).join("") + "</optgroup>").join("") + opt(fb.target_other);
   }
@@ -774,14 +791,16 @@ $("#fb-form").addEventListener("submit", async e => {
   e.preventDefault();
   const fb = catalog.feedback, msg = $("#fb-msg"), body = $("#fb-body").value;
   if (!body.trim()) { msg.textContent = fb.empty; msg.className = "err"; $("#fb-body").focus(); return; }
+  const email = fb.email_label ? $("#fb-email").value.trim() : "";
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = fb.email_invalid || ""; msg.className = "err"; $("#fb-email").focus(); return; }
   $("#fb-send").disabled = true; msg.textContent = fb.sending; msg.className = "";
   try {
     // 文字列で送ると text/plain になり、事前の問い合わせ（プリフライト）なしで届く
     const res = await fetch(fb.endpoint, {method: "POST", body: JSON.stringify({
-      name: $("#fb-name").value, target: $("#fb-target").value, body, website: $("#fb-website").value, rid: fbRid})});
+      name: $("#fb-name").value, email, target: $("#fb-target").value, body, website: $("#fb-website").value, rid: fbRid})});
     const r = await res.json();
     if (!r.ok) throw new Error(r.error || "failed");
-    $("#fb-name").value = ""; $("#fb-body").value = ""; $("#fb-target").selectedIndex = 0; fbRid = newRid();
+    $("#fb-name").value = ""; $("#fb-email").value = ""; $("#fb-body").value = ""; $("#fb-target").selectedIndex = 0; fbRid = newRid();
     $("#fb-thanks").textContent = fb.thanks;
     ga("tlf_feedback_sent");
     $("#fb-form").style.display = "none"; $("#fb-done").style.display = "block";

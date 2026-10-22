@@ -338,6 +338,18 @@ footer.note{margin-top:clamp(30px,6vh,60px);text-align:center;font-size:15px;fon
 .otile .od{display:block;margin-top:2px;font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .otile .sub{display:block;font:500 12px/1.4 var(--mincho);color:var(--muted)}
 .otile .oseal{position:absolute;top:-1px;right:10px;padding:1px 7px 2px;border-radius:0 0 4px 4px;background:var(--gold);color:#0a0d17;font:700 10.5px/1.4 var(--mincho);letter-spacing:.1em}
+/* 原典：論文ごとに1行。左に呼び名と正式名称、右に版のボタン（日本語の組｜英語の組） */
+.gtable{max-width:980px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.grow{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:18px;align-items:center;padding:16px 18px;border:1px solid rgba(216,178,106,.4);border-radius:6px;
+  background:linear-gradient(180deg,rgba(27,38,72,.9),rgba(10,13,23,.93))}
+.gname b{display:block;font:800 clamp(17px,1.9vw,20px)/1.4 var(--mincho);letter-spacing:.04em;color:var(--gold-hi)}
+.gname span{display:block;margin-top:4px;font:500 13px/1.6 var(--mincho);color:var(--muted)}
+.glinks{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.glinks .gsep{width:1px;align-self:stretch;min-height:28px;margin:0 4px;background:rgba(216,178,106,.45)}
+.gl{display:inline-block;padding:8px 14px;border-radius:18px;border:1px solid var(--gold-lo);background:rgba(10,13,23,.72);color:var(--parch);
+  font:700 14px/1.2 var(--mincho);text-decoration:none;white-space:nowrap;transition:border-color .15s ease,background .15s ease,color .15s ease}
+.gl:hover,.gl:focus-visible{border-color:var(--gold);background:rgba(216,178,106,.2);color:var(--gold-hi);outline:none}
+@media (max-width:760px){.grow{grid-template-columns:minmax(0,1fr);gap:10px;padding:14px}.glinks .gsep{flex-basis:100%;width:auto;height:0;min-height:0;margin:0;background:none}}
 .mextra h3{margin:0 0 4px 4px;font:600 13px/1.4 var(--mincho);color:var(--gold)}
 .mextra p{margin:0 0 6px 4px;font:500 12.5px/1.6 var(--mincho);color:var(--muted)}
 #books-list h2.group{margin:6px 0 0 4px;text-align:left;font:600 12.5px/1.2 var(--mincho);letter-spacing:.08em;color:var(--gold);text-shadow:0 1px 6px rgba(0,0,0,.9)}
@@ -556,7 +568,7 @@ function padlock() {
 const CHAINS = `<span class="chains" aria-hidden="true"><i></i><i></i></span>`;
 function renderDoors() {
   $("#doors").innerHTML = catalog.categories.map(c => {
-    const n = c.kind === "books" ? (catalog.books || []).length : c.kind === "media" ? (catalog.media || []).length : c.kind === "links" ? (c.sections || []).reduce((a, x) => a + x.items.length, 0) : catalog.games.filter(g => g.category === c.id).length;
+    const n = c.kind === "books" ? (catalog.books || []).length : c.kind === "media" ? (catalog.media || []).length : c.kind === "links" ? (c.rows ? c.rows.length : (c.sections || []).reduce((a, x) => a + x.items.length, 0)) : catalog.games.filter(g => g.category === c.id).length;
     const unit = c.unit_en ? c.unit_en[n === 1 ? 0 : 1] : c.kind === "books" ? (n === 1 ? "Book" : "Books") : c.kind === "media" ? "Series" : c.kind === "links" ? (n === 1 ? "Link" : "Links") : c.id === "quests" ? (n === 1 ? "Quest" : "Quests") : c.id === "audio" ? (n === 1 ? "Recording" : "Recordings") : (n === 1 ? "Lecture" : "Lectures");
     const sub = c.subtitle ? `<p class="sub">${esc(c.subtitle)}</p>` : "";
     if (c.seal) return `<button class="door sealed" data-go="#/${esc(c.id)}">
@@ -713,6 +725,14 @@ function renderLinks(c) {
         (m ? `<span class="price${/^無料/.test(m[1]) ? " free" : ""}">${esc(m[1].replace(/^有料\s*/, ""))}</span>` : "") + `</a>`;
     };
     $("#cards").innerHTML = (c.sections || []).map(x => `<div class="lsec"><h3>${esc(x.heading)}</h3><div class="tlist">` + x.items.map(it => row(it, x.look)).join("") + `</div></div>`).join("");
+    return;
+  }
+  if (c.style === "table") {
+    // 原典：論文ごとに1行。版のボタンは groups の順に並べ、組のあいだに区切り線
+    $("#cards").innerHTML = `<div class="gtable">` + (c.rows || []).map(r => `<div class="grow"><div class="gname"><b>${esc(r.name)}</b>` +
+      (r.formal ? `<span>${esc(r.formal)}</span>` : "") + `</div><div class="glinks">` +
+      r.groups.map(g => g.map(l => `<a class="gl" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" data-link="${esc(c.ja + "：" + r.name + "・" + l.label)}">${esc(l.label)}</a>`).join("")).join(`<span class="gsep" aria-hidden="true"></span>`) +
+      `</div></div>`).join("") + `</div>`;
     return;
   }
   if (c.style === "official") {
